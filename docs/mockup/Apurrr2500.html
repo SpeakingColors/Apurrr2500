@@ -1,0 +1,650 @@
+<title>Apurrr2500 Mockup</title>
+<!-- v2: sourced calibration, tilt curves, link, blend, Old vs New display -->
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;1,700;1,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one fixed-size stage (1360 x 660) scaled as a piece. Wood cheeks left and right, faceplate between:
+   header, four display cells with their controls directly underneath (Level, Detector, Time, Meter),
+   preview rig, footer. In, gain reduction and out meters run down the far right. */
+:root{
+  --bg:#0b0b0d; --plate:#16171a; --plate2:#1e2024; --line:#33363d; --ink:#f4f5f7; --dim:#a9adb8;
+  --title:#e8e9ee; --accent:#02EBBA; --disp:#06080a; --grid:#1b2523;
+  --g:#02EBBA; --y:#FFD100; --o:#F57F01; --r:#FF1383; --b:#6CC9F5; --p:#A43DFF;
+  --sel:#241238; --selb:#CD92FE; --pink:#FF7BB1;
+  --font-ui:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --font-num:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+  color-scheme:dark;
+}
+#app[data-look="A"]{--bg:#161638;--plate:#1c1c4a;--plate2:#2C2C62;--line:#33403f;--ink:#e8e6e1;--dim:#9a9690;--title:#E1CBF4;--accent:#FFA600;--disp:#05060d;--y:#FFA600}
+#app[data-look="B"]{--bg:#0b0b0d;--plate:#15161a;--plate2:#1c1d22;--line:#2b2d34;--ink:#f4f5f7;--dim:#a9adb8;--title:#E1CBF4;--accent:#A43DFF;--disp:#06080a}
+html,body{background:var(--bg);margin:0}
+#stage,#stage *{box-sizing:border-box}
+body{color:var(--ink);font-family:var(--font-ui);padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-x:hidden}
+#app{background:var(--bg);display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+#frame{position:relative;flex:none}
+#stage{position:absolute;left:0;top:0;width:1360px;height:660px;transform-origin:0 0;display:flex;background:#000;user-select:none;-webkit-user-select:none}
+.cheek{width:52px;flex:none;position:relative;cursor:default}
+.cheek canvas{width:100%;height:100%;display:block}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--plate);position:relative}
+.hdr{height:46px;flex:none;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid var(--line);background:var(--plate2)}
+.brand{display:flex;align-items:center;gap:8px}
+.brand .name{font-style:italic;font-weight:800;font-size:28px;letter-spacing:.5px;color:#fff;line-height:1;white-space:nowrap}
+.brand .name b{color:var(--accent);font-weight:800}
+.brand .s87{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--dim)}
+.sp{flex:1}
+button,select,input{font-family:var(--font-ui)}
+.btn{background:var(--plate);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:3px 10px;font-size:14px;letter-spacing:.5px;cursor:pointer;line-height:1.2}
+.btn:hover{border-color:var(--dim)}
+.btn:focus-visible,.knob:focus-visible,.sbtn:focus-visible,.chip:focus-visible,.chip2:focus-visible,.rh:focus-visible{outline:2px solid var(--selb);outline-offset:2px}
+.btn.on{background:var(--sel);border-color:var(--selb);color:#E1CBF4}
+.presetbar{display:flex;align-items:center;gap:4px}
+.presetbar .pname{min-width:220px;text-align:center;font-size:16px;font-weight:600}
+.body{flex:1;display:grid;grid-template-columns:1fr 124px;min-height:0;overflow:hidden}
+.left{display:flex;flex-direction:column;min-width:0}
+.cols{display:grid;grid-template-columns:300px 260px 300px 228px;gap:8px;padding:0 10px}
+.disp{height:156px;flex:none;padding-top:8px;padding-bottom:8px;border-bottom:1px solid var(--line);background:var(--plate2);padding-left:10px;padding-right:10px}
+.disp.cols{padding-left:10px;padding-right:10px}
+.dcell{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dcell .cap{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--title);height:14px;line-height:14px;white-space:nowrap}
+.dcell canvas{background:var(--disp);border:1px solid var(--line);border-radius:3px;display:block}
+.ctl{flex:1;min-height:0;padding-top:6px;padding-bottom:6px;align-content:start}
+.col{display:flex;flex-direction:column;gap:6px;min-width:0;position:relative}
+.sh{font-size:14px;font-weight:700;letter-spacing:3px;color:var(--title);text-transform:uppercase;border-bottom:2px solid var(--kc,var(--accent));padding-bottom:2px;display:flex;justify-content:space-between;align-items:baseline;white-space:nowrap}
+.sh small{font-size:11px;letter-spacing:1.5px;color:var(--dim);font-weight:500}
+.krow{display:flex;justify-content:space-between;align-items:flex-start;gap:4px}
+.kc{display:flex;flex-direction:column;align-items:center;width:100px;position:relative;transition:opacity .15s}
+.kc.off{opacity:.45}
+.kc .lab{font-size:14px;letter-spacing:2.5px;color:var(--title);font-weight:700;height:18px;text-transform:uppercase;white-space:nowrap}
+.knob{width:96px;height:96px;cursor:ns-resize;touch-action:none;border-radius:50%}
+.knob svg{width:96px;height:96px;display:block}
+.kval{font-family:var(--font-num);font-size:12px;color:var(--dim);margin-top:0;height:16px;white-space:nowrap;text-align:center}
+.kval b{color:var(--ink);font-weight:600}
+.strip{display:flex;gap:2px;justify-content:space-between}
+.chip2{flex:1;min-width:0;background:var(--disp);border:1px solid var(--line);color:var(--dim);border-radius:3px;padding:2px 0;font-family:var(--font-num);font-size:11px;cursor:pointer;text-align:center;white-space:nowrap}
+.chip2:hover{border-color:var(--dim)}
+.chip2.on{background:var(--sel);border-color:var(--selb);color:#E1CBF4}
+.seg{display:flex;flex-direction:column;gap:3px}
+.seg .sl{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--title);white-space:nowrap}
+.sr{display:flex;gap:3px}
+.sbtn{width:48px;height:38px;background:linear-gradient(#3a3c43,#2a2c31);border:1px solid #000;border-radius:5px;color:var(--dim);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0;box-shadow:0 2px 0 #000,inset 0 1px 0 rgba(255,255,255,.15);font-size:13px;letter-spacing:.3px;line-height:1}
+.sbtn i{display:block;width:9px;height:9px;border-radius:50%;background:#1a1b1e;box-shadow:inset 0 0 2px #000}
+.sbtn.on{color:var(--ink)}
+.sbtn.on i{background:var(--lc);box-shadow:0 0 7px 1px var(--lc),inset 0 0 2px rgba(255,255,255,.6)}
+.sbtn:active{transform:translateY(1px);box-shadow:0 1px 0 #000,inset 0 1px 0 rgba(255,255,255,.1)}
+.tgl{width:auto;min-width:100px;padding:0 10px;flex-direction:row;gap:8px;height:30px;justify-content:flex-start}
+.tgl.dis{opacity:.45}
+.row2{display:flex;gap:10px;align-items:flex-start}
+.led{width:9px;height:9px;border-radius:50%;background:#26282c;box-shadow:inset 0 0 2px #000;display:inline-block}
+.led.on{background:var(--r);box-shadow:0 0 7px 1px var(--r)}
+.plate{border:1px solid var(--line);border-radius:6px;padding:8px;background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(0,0,0,.2));display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.plate .pt{font-size:15px;letter-spacing:3px;color:var(--title);text-transform:uppercase;font-weight:700}
+.plate .ps{font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.rig{height:52px;flex:none;border-top:1px solid var(--line);background:var(--plate2);display:flex;align-items:center;gap:10px;padding:0 12px;position:relative}
+.rig .tag{position:absolute;right:10px;top:4px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);border:1px dashed var(--line);padding:1px 6px;border-radius:3px}
+.rig select{background:var(--disp);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:4px 6px;font-size:14px}
+.rig .hint{font-size:13px;color:var(--dim);max-width:560px;line-height:1.15;padding-top:10px}
+.meters{border-left:1px solid var(--line);background:var(--plate2);display:flex;flex-direction:column;align-items:center;padding:8px 0 6px;gap:4px}
+.meters .mrow{display:flex;gap:4px;align-items:flex-start}
+.meters .cap{font-size:12px;letter-spacing:1px;color:var(--title);text-transform:uppercase;display:grid;grid-template-columns:38px 38px 38px;gap:4px;text-align:center}
+.meters .pk{font-family:var(--font-num);font-size:10px;color:var(--dim);display:grid;grid-template-columns:38px 38px 38px;gap:4px;text-align:center}
+.foot{height:26px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:12px;color:var(--dim);letter-spacing:1px;border-top:1px solid var(--line);background:var(--plate2)}
+/* overlays */
+#modal{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:30}
+#modal[hidden]{display:none}
+.dlg{width:760px;max-height:620px;background:var(--plate);border:1px solid var(--selb);border-radius:8px;display:flex;flex-direction:column;box-shadow:0 10px 40px #000}
+.dlg h2{margin:0;padding:10px 16px;font-size:20px;letter-spacing:1px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:var(--title)}
+.dlg .dbody{padding:12px 16px;overflow:auto;font-size:15px;line-height:1.35;min-height:0;scrollbar-width:none}
+.dlg .dbody::-webkit-scrollbar{display:none}
+.dlg .dfoot{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.dlg label{display:flex;align-items:center;gap:8px;margin:6px 0}
+.dlg input[type=text],.dlg input:not([type]),.dlg select,.dlg textarea{background:var(--disp);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:5px 8px;font-size:15px}
+.dlg textarea{width:100%;height:230px;font-family:var(--font-num);font-size:12px;box-sizing:border-box;scrollbar-width:none}
+.dlg kbd{font-family:var(--font-num);font-size:12px;border:1px solid var(--line);border-radius:3px;padding:0 5px;background:var(--disp)}
+.dlg table{border-collapse:collapse;width:100%}
+.dlg td{padding:3px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.dlg .links{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.dlg .links a{background:var(--sel);border:1px solid var(--selb);color:#E1CBF4;border-radius:4px;padding:4px 12px;text-decoration:none;font-size:15px}
+.pb{display:grid;grid-template-columns:300px 1fr;gap:14px;height:400px}
+.pb .list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:4px;overflow:auto;background:var(--disp);scrollbar-width:none}
+.pb .list::-webkit-scrollbar{display:none}
+.pb .item{padding:5px 10px;cursor:pointer;display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);font-size:15px}
+.pb .item.sel{background:var(--sel);color:#E1CBF4}
+.pb .item small{color:var(--dim);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.chips{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0}
+.chip{background:var(--disp);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:1px 9px;font-size:13px;cursor:pointer}
+.chip.on{background:var(--sel);border-color:var(--selb);color:#E1CBF4}
+.warn{color:var(--r)}
+#tip{position:absolute;max-width:340px;background:#000;border:1px solid var(--selb);color:var(--ink);padding:6px 9px;border-radius:5px;font-size:14px;line-height:1.25;z-index:50;pointer-events:none}
+#tip[hidden]{display:none}
+#toast{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);background:#000;border:1px solid var(--selb);padding:5px 14px;border-radius:5px;font-size:15px;z-index:60}
+#toast[hidden]{display:none}
+/* resize handles live on the unscaled frame */
+.rh{position:absolute;z-index:20;background:transparent}
+.rh.n{left:12px;right:12px;top:-4px;height:8px;cursor:ns-resize}.rh.s{left:12px;right:12px;bottom:-4px;height:8px;cursor:ns-resize}
+.rh.e{top:12px;bottom:12px;right:-4px;width:8px;cursor:ew-resize}.rh.w{top:12px;bottom:12px;left:-4px;width:8px;cursor:ew-resize}
+.rh.ne{right:-5px;top:-5px;width:14px;height:14px;cursor:nesw-resize}.rh.sw{left:-5px;bottom:-5px;width:14px;height:14px;cursor:nesw-resize}
+.rh.nw{left:-5px;top:-5px;width:14px;height:14px;cursor:nwse-resize}.rh.se{right:-5px;bottom:-5px;width:14px;height:14px;cursor:nwse-resize}
+.zoomrow{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--dim);flex-wrap:wrap;justify-content:center}
+.zoomrow .btn{padding:1px 8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div id="app" data-look="C">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <radialGradient id="kcap" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#6b6d78"/><stop offset=".5" stop-color="#3b3d45"/><stop offset="1" stop-color="#1b1c20"/></radialGradient>
+  </defs></svg>
+  <div id="frame">
+    <div id="stage">
+      <div class="cheek" id="cheekL" data-tip="Double-click the wood to reset the window to 100%."><canvas></canvas></div>
+      <div class="main">
+        <header class="hdr">
+          <div class="brand">
+            <svg width="34" height="34" viewBox="0 0 64 64" aria-label="Cat head logo"><path d="M8 6 L24 22 H40 L56 6 L60 36 Q60 58 32 60 Q4 58 4 36 Z" fill="#FF7BB1"/><path d="M12 14 L21 23 H14 Z M52 14 L43 23 H50 Z" fill="#FBBDD0"/><ellipse cx="22" cy="36" rx="4" ry="5" fill="#16171a"/><ellipse cx="42" cy="36" rx="4" ry="5" fill="#16171a"/><path d="M29 44 H35 L32 48 Z" fill="#16171a"/><path d="M32 48 Q28 53 24 50 M32 48 Q36 53 40 50" stroke="#16171a" stroke-width="2" fill="none"/><path d="M2 40 H14 M2 46 H14 M62 40 H50 M62 46 H50" stroke="#FBBDD0" stroke-width="1.6"/></svg>
+            <span class="name">Apurrr<b>2500</b></span><span class="s87">Studio 87</span>
+          </div>
+          <div class="sp"></div>
+          <div class="presetbar">
+            <button class="btn" id="pPrev" data-tip="Previous preset.">&#9664;</button>
+            <button class="btn pname" id="pName" data-tip="Open the preset browser. Double-click to rename your own preset.">Start Here</button>
+            <button class="btn" id="pNext" data-tip="Next preset.">&#9654;</button>
+            <button class="btn" id="pSave" data-tip="Save these settings as your own preset. Asks before overwriting.">Save</button>
+          </div>
+          <div class="sp"></div>
+          <button class="btn" id="bBypass" aria-pressed="false" data-tip="Bypass: hear the dry signal to compare with the compressed sound (B). The meters keep moving.">Bypass</button>
+          <button class="btn" id="bGuide" data-tip="Short guide and keyboard shortcuts.">Guide</button>
+          <button class="btn" id="bSettings" data-tip="Info bubbles, power saving, colour look, needle meter.">Settings</button>
+          <button class="btn" id="bAbout" data-tip="About Apurrr2500, support and where your files live.">About &amp; Support</button>
+        </header>
+        <div class="body">
+          <div class="left">
+            <section class="disp cols">
+              <div class="dcell"><div class="cap">Transfer curve</div><canvas id="cvCurve" width="300" height="124" data-tip="Input level (across) against output level (up), in dB. The line follows Threshold, Ratio, Knee and Make-up. The dot is the live signal."></canvas></div>
+              <div class="dcell"><div class="cap">Detector listens to</div><canvas id="cvFilt" width="260" height="124" data-tip="Tilt filter: how the detector hears each frequency, in dB. Lows count less and highs count more when Tilt is Med or Loud, so the compressor reacts less to the kick and more to the top end."></canvas></div>
+              <div class="dcell"><div class="cap">Gain reduction, last 6 s</div><canvas id="cvHist" width="300" height="124" data-tip="How much the compressor turned the signal down, in dB, over the last six seconds. Mint is left, pink dashed is right."></canvas></div>
+              <div class="dcell"><div class="cap" id="mCap">Meter: gain reduction</div><canvas id="cvNeedle" width="228" height="124" data-tip="Stereo needle meter with a dB scale. Choose what it shows with the Meter switch below: gain reduction, output level or input level. Mint is left, pink is right."></canvas></div>
+            </section>
+            <section class="ctl cols" id="ctl"></section>
+            <section class="rig">
+              <button class="btn" id="rigPlay" data-tip="Start or stop the preview sound (Space).">&#9654; Play preview</button>
+              <select id="rigSrc" aria-label="Preview source" data-tip="Test sound for the preview. The meters and displays move even when it is not playing.">
+                <option value="mix">Full mix loop</option><option value="drums">Drum loop</option><option value="bass">Bass</option><option value="chords">Chord stabs</option><option value="file">Your file</option>
+              </select>
+              <button class="btn" id="rigFile" data-tip="Load your own audio file for the preview. Nothing is uploaded.">Load file</button>
+              <input type="file" id="rigFileIn" accept="audio/*" hidden>
+              <div class="hint" id="rigHint">Bypass (B) switches between compressed and dry to compare. With Ext SC on, the detector listens to a built-in kick instead of the signal.</div>
+              <div class="tag">Preview rig, not part of the plugin</div>
+            </section>
+          </div>
+          <aside class="meters">
+            <div class="cap"><span>In</span><span>GR</span><span>Out</span></div>
+            <div class="mrow"><canvas id="cvIn" width="38" height="360" data-tip="Input level meter in dB. Blue is safe, purple is the warning zone, pink is clipping. Click to clear the clip light."></canvas><canvas id="cvGR" width="38" height="360" data-tip="Gain reduction meter in dB, left and right. It hangs from the top: the longer the bar, the more the signal is turned down."></canvas><canvas id="cvOut" width="38" height="360" data-tip="Output level meter in dB. Blue is safe, purple is the warning zone, pink is clipping. Click to clear the clip light."></canvas></div>
+            <div class="pk"><span id="pkIn">-inf</span><span id="pkGR">0.0</span><span id="pkOut">-inf</span></div>
+          </aside>
+        </div>
+        <footer class="foot"><span>Studio 87 &middot; Apurrr2500 v0.2 design mockup</span><span id="winsz">1360 &times; 660</span></footer>
+      </div>
+      <div class="cheek" id="cheekR" data-tip="Double-click the wood to reset the window to 100%."><canvas></canvas></div>
+      <div id="modal" hidden></div>
+      <div id="tip" hidden></div>
+      <div id="toast" hidden></div>
+    </div>
+    <div class="rh n" data-h="n"></div><div class="rh s" data-h="s"></div><div class="rh e" data-h="e"></div><div class="rh w" data-h="w"></div>
+    <div class="rh ne" data-h="ne"></div><div class="rh nw" data-h="nw"></div><div class="rh se" data-h="se"></div><div class="rh sw" data-h="sw"></div>
+  </div>
+  <div class="zoomrow"><button class="btn" id="zMinus" aria-label="Smaller">&minus;</button><button class="btn" id="zPct" data-tip="">100%</button><button class="btn" id="zPlus" aria-label="Larger">+</button><span>Drag any edge or corner to resize. Double-click the wood to reset.</span></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ============ DSP model for the animation (a JS sketch, not the C++ core) ============ */
+const D2L=db=>Math.pow(10,db*0.05), L2D=x=>20*Math.log10(Math.max(x,1e-9));
+/* first-order section: unity gain at DC, rises by `rise` dB between fz and fp */
+class Sec{constructor(){this.b0=1;this.b1=0;this.a1=0;this.x1=0;this.y1=0}
+ reset(){this.x1=this.y1=0}
+ set(fs,fz,fp){const fm=Math.sqrt(fz*fp),K=2*Math.PI*fm/Math.tan(Math.PI*fm/fs),a=K/(2*Math.PI*fz),b=K/(2*Math.PI*fp);this.b0=(1+a)/(1+b);this.b1=(1-a)/(1+b);this.a1=(1-b)/(1+b)}
+ p(x){const y=this.b0*x+this.b1*this.x1-this.a1*this.y1;this.x1=x;this.y1=y;return y}
+ mag(f,fs){const w=2*Math.PI*f/fs,c=Math.cos(w),s=Math.sin(w),nr=this.b0+this.b1*c,ni=-this.b1*s,dr=1+this.a1*c,di=-this.a1*s;return Math.hypot(nr,ni)/Math.hypot(dr,di)}}
+const NSEC=12;
+function tiltDef(mode){const rises=[];let g0=0;
+ /* 3 dB per octave (2.5 dB per quarter decade, 12 sections from 20 Hz). Loud: whole range, -15 dB at 20 Hz to +15 dB at 20 kHz.
+    Med: same slope below 200 Hz and above 3 kHz, flat in between. */
+ for(let i=0;i<NSEC;i++){const on=mode===2||(mode===1&&(i<=3||i>=9));rises.push(on?2.5:0)}
+ if(mode===2)g0=-15;else if(mode===1)g0=-10;return{rises,g0}}
+function gcomp(L,thr,R,w){const over=L-thr;if(2*over<-w)return 0;let out;
+ if(2*Math.abs(over)<=w){const k=over+w*.5;out=L+(1/R-1)*k*k/(2*w)}else out=thr+over/R;return Math.max(0,L-out)}
+function staticOut(L,p){const mu=p.inSw?p.mu:0;if(!p.inSw)return L;if(!p.fb)return L-gcomp(L,p.thr,p.R,p.w)+mu;
+ let lo=L+mu-40,hi=L+mu;for(let i=0;i<30;i++){const m=.5*(lo+hi);if(m+gcompFb(m,p.thr,p.R,p.w)-(L+mu)>0)hi=m;else lo=m}return .5*(lo+hi)}
+function gcompFb(outDb,thr,R,w){w=Math.max(w,.5);const start=thr-.5*w;if(outDb<=start)return 0;const d=outDb-start,a=(1/R-1)/(2*w),dEnd=w*(.5+.5/R);let inDb;
+ if(d>=dEnd)inDb=thr+(outDb-thr)*R;else{const disc=Math.max(0,1+4*a*d);const u=Math.abs(a)<1e-9?d:(-1+Math.sqrt(disc))/(2*a);inDb=start+u}
+ return Math.min(40,Math.max(0,inDb-outDb))}
+class Engine{
+ constructor(){this.fs=48000;
+  this.p={thr:-26,R:2,w:6,atk:10,rel:200,fb:false,ext:false,tilt:0,link:1,shape:0,mu:0,blend:0,mix:1,inSw:true,bypass:false,levelMatch:false};
+  this.sec=[[],[]];for(let c=0;c<2;c++)for(let i=0;i<NSEC;i++)this.sec[c].push(new Sec());
+  this.g0lin=1;this.curMu=1;this.tMu=1;this.pw=[1e-12,1e-12];this.g=[0,0];this.lkS=[0,0];this.yPrev=[0,0];
+  this.lm=1;this.eD=0;this.eW=0;this.inPk=0;this.outPk=0;this.grL=0;this.grR=0;this.grPk=0;this.aIn=[1e-9,1e-9];this.aOut=[1e-9,1e-9];this.kAvg=0;this.avgMs=300;
+  this.prepare(48000)}
+ prepare(fs){this.fs=fs;this.sc=1-Math.exp(-1/(0.010*fs));this.kRms=1-Math.exp(-1/(0.003*fs));this.setP(this.p,true)}
+ setAvg(ms){this.avgMs=ms;this.kAvg=1-Math.exp(-1/(ms*0.001*this.fs))}
+ setP(np,force){const o=this.p,tiltChanged=force||(np.tilt!==undefined&&np.tilt!==o.tilt);Object.assign(o,np);const fs=this.fs;
+  this.aAtk=Math.exp(-1/(Math.max(.02,o.atk)*0.001*fs));this.aRel=Math.exp(-1/(o.rel*0.001*fs));
+  this.tMu=D2L(o.mu);this.kShape=[1,1-Math.exp(-1/(0.040*fs)),1-Math.exp(-1/(0.150*fs))][o.shape];
+  if(tiltChanged){const d=tiltDef(o.tilt);this.g0lin=D2L(d.g0);for(let c=0;c<2;c++)for(let i=0;i<NSEC;i++){const fz=20*Math.pow(10,.25*i),fp=fz*D2L(Math.max(.001,d.rises[i]));this.sec[c][i].set(fs,fz,fp)}this.rises=d.rises}
+  if(!this.kAvg)this.setAvg(this.avgMs)}
+ tiltMag(f){let m=this.g0lin;for(let i=0;i<NSEC;i++)m*=this.sec[0][i].mag(f,this.fs);return m}
+ tilt(c,x){let y=x;if(this.p.tilt){for(let i=0;i<NSEC;i++)y=this.sec[c][i].p(y);y*=this.g0lin}return y}
+ smooth(cur,t){const p=this.p,kMax=p.fb?Math.max(1/Math.min(p.R,20),.05):1;const k=t>cur?1-this.aAtk:1-this.aRel;return cur+(t-cur)*Math.min(k,kMax)}
+ process(L,R,n,S){const p=this.p,ch=[L,R];let ip=0,op=0,gl=0,gr=0;const lv=[0,0],eff=[0,0];
+  for(let i=0;i<n;i++){this.curMu+=(this.tMu-this.curMu)*this.sc;
+   const dry=[L[i],R[i]];ip=Math.max(ip,Math.abs(dry[0]),Math.abs(dry[1]));
+   for(let c=0;c<2;c++){const s=p.fb?this.yPrev[c]:(p.ext&&S?S[i]:dry[c]);const d=this.tilt(c,s);this.pw[c]+=(d*d-this.pw[c])*this.kRms;lv[c]=10*Math.log10(Math.max(this.pw[c],1e-12))}
+   for(let c=0;c<2;c++){const t=p.inSw?(p.fb?gcompFb(lv[c],p.thr,p.R,p.w):gcomp(lv[c],p.thr,p.R,p.w)):0;this.g[c]=this.smooth(this.g[c],t)}
+   this.lkS[0]+=(this.g[1]-this.lkS[0])*this.kShape;this.lkS[1]+=(this.g[0]-this.lkS[1])*this.kShape;
+   for(let c=0;c<2;c++){eff[c]=p.inSw?this.g[c]*(1-p.link/2)+this.lkS[c]*(p.link/2):0}
+   gl=Math.max(gl,eff[0]);gr=Math.max(gr,eff[1]);
+   for(let c=0;c<2;c++){const y=dry[c]*D2L(-eff[c]);let w=p.inSw?y*this.curMu:y;this.yPrev[c]=w;
+    if(p.levelMatch){const k=1-Math.exp(-1/(1.0*this.fs));this.eD+=(dry[c]*dry[c]-this.eD)*k;this.eW+=(w*w-this.eW)*k;if(this.eD>1e-9&&this.eW>1e-9){const t=Math.min(16,Math.max(.0625,Math.sqrt(this.eD/this.eW)));this.lm+=(t-this.lm)*(1-Math.exp(-1/(2.0*this.fs)))}w*=this.lm}
+    let o;if(p.blend===0)o=w;else if(p.blend===1)o=dry[c]*(1-p.mix)+w*p.mix;else o=dry[c]+p.mix*w;
+    if(!isFinite(o)){this.reset();o=0}if(p.bypass)o=dry[c];
+    ch[c][i]=o;op=Math.max(op,Math.abs(o));
+    this.aIn[c]+=(dry[c]*dry[c]-this.aIn[c])*this.kAvg;this.aOut[c]+=(o*o-this.aOut[c])*this.kAvg}}
+  this.grL=eff[0];this.grR=eff[1];this.grPk=Math.max(gl,gr);this.grLp=gl;this.grRp=gr;
+  const dec=Math.pow(.9,n/512);this.inPk=Math.max(ip,this.inPk*dec);this.outPk=Math.max(op,this.outPk*dec)}
+ resetLM(){this.lm=1;this.eD=0;this.eW=0}
+ reset(){for(let c=0;c<2;c++){for(const s of this.sec[c])s.reset();this.pw[c]=1e-12;this.g[c]=0;this.yPrev[c]=0}this.lkS=[0,0]}}
+/* ============ Preview sources (synthesised, deterministic) ============ */
+const BPM=140,STEP=60/BPM/4,KP=[1,0,0,0,1,0,0,0,1,0,1,0,1,0,0,0],SP=[0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1],HP_=[0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,1],CP=[1,0,0,1,0,0,1,0,0,0,1,0,0,1,0,0];
+const nz=i=>((Math.imul(i|0,1664525)+1013904223)>>>0)/2147483648-1;
+function tauOf(pat,t){const s=t/STEP,si=Math.floor(s),fr=s-si;for(let k=0;k<16;k++){if(pat[(((si-k)%16)+16)%16])return (k+fr)*STEP}return 99}
+let fileBuf=null;
+function srcSample(kind,i,fs){const t=i/fs;let v=0;
+ if(kind==='file'&&fileBuf){return fileBuf[i%fileBuf.length]}
+ const kk=kind==='kick',dr=(kind==='drums'||kind==='mix'||kk),ba=(kind==='bass'||kind==='mix'),ch=(kind==='chords'||kind==='mix');
+ if(dr){const tk=tauOf(KP,t);
+  if(tk<.5)v+=(Math.sin(2*Math.PI*(45*tk+90*(1-Math.exp(-35*tk))/35))*Math.exp(-tk*9)+(tk<.004?nz(i)*.5:0))*.9;
+  if(!kk){const ts=tauOf(SP,t),th=tauOf(HP_,t);
+   if(ts<.3)v+=(nz(i*3)*Math.exp(-ts*18)*.5+Math.sin(2*Math.PI*190*ts)*Math.exp(-ts*25)*.5)*.7;
+   if(th<.1)v+=(nz(i)-nz(i-1))*Math.exp(-th*60)*.25}}
+ if(ba){const f=55,ph=(t*f)%1,env=.7+.3*Math.sin(2*Math.PI*t*BPM/60);v+=(2*ph-1)*.28*env}
+ if(ch){const tc=tauOf(CP,t);if(tc<.35){let s=0;for(const f of[220,261.63,329.63]){s+=2*((t*f)%1)-1}v+=s/3*.35*Math.exp(-tc*7)}}
+ return v}
+function fillSrc(kind,pos,n,L,R,fs){for(let i=0;i<n;i++){const s=srcSample(kind,pos+i,fs);L[i]=s;R[i]=kind==='chords'||kind==='mix'?srcSample(kind,pos+i+23,fs)*.9+s*.1:s}}
+function fillSc(pos,n,S,fs){for(let i=0;i<n;i++)S[i]=srcSample('kick',pos+i,fs)*.55}
+/* ============ State, mapping, presets ============ */
+const RATS=[1.5,2,3,4,6,10,1000],RATL=['1.5:1','2:1','3:1','4:1','6:1','10:1','Inf:1'],RATC=['1.5','2','3','4','6','10','Inf'];
+const ATKS=[.03,.1,.3,1,3,10,30],ATKL=['0.03 ms','0.1 ms','0.3 ms','1 ms','3 ms','10 ms','30 ms'],ATKC=['.03','.1','.3','1','3','10','30'];
+const RELS=[50,100,200,500,1000,2000],RELC=['50','100','200','500','1s','2s','Var'];
+const LINKP=[0,.5,.6,.7,.8,.9,1],LINKL=['IND','50%','60%','70%','80%','90%','100%'],LINKC=['IND','50','60','70','80','90','100'];
+const KNEEW=[12,6,.5],ALIGN=22;
+const DEF={thr:4,ratio:1,attack:5,release:2,relVar:150,knee:1,tilt:0,type:1,extSc:0,link:6,shape:0,muMode:0,gain:0,blend:0,mix:100,inSw:1};
+const PKEYS=Object.keys(DEF);
+const LIM={thr:[-20,10],ratio:[0,6],attack:[0,6],release:[0,6],relVar:[50,3000],knee:[0,2],tilt:[0,2],type:[0,1],extSc:[0,1],link:[0,6],shape:[0,2],muMode:[0,1],gain:[0,24],blend:[0,2],mix:[0,100],inSw:[0,1]};
+const st=Object.assign({bypass:0,levelMatch:0,meter:0},DEF);
+const settings={tips:true,power:false,look:'C',needle:300,ref:18};try{Object.assign(settings,JSON.parse(localStorage.getItem('apurrr2500-settings')||'{}'))}catch(e){}
+function autoMu(){return Math.min(24,Math.max(0,gcomp(-18,st.thr-ALIGN,RATS[st.ratio],KNEEW[st.knee])))}
+function core(){let rel=st.release<6?RELS[st.release]:st.relVar;
+ return{thr:st.thr-ALIGN,R:RATS[st.ratio],w:KNEEW[st.knee],atk:ATKS[st.attack],rel,fb:st.type===0,ext:st.type===1&&!!st.extSc,tilt:st.tilt,link:LINKP[st.link],shape:st.shape,
+  mu:st.muMode?st.gain:autoMu(),blend:st.blend,mix:st.mix/100,inSw:!!st.inSw,bypass:!!st.bypass,levelMatch:!!st.levelMatch}}
+const TYPES=['Drum','Bass','Vocal','Synth','Mix','Master','FX'];
+const F=(name,type,tags,p)=>({name,type,tags,p:Object.assign({},DEF,p),factory:true});
+const FACTORY=[
+ F('Start Here','Mix',['start','general'],{}),
+ F('Drum Bus Glue','Drum',['glue','drums'],{thr:3,ratio:3,attack:6,release:1,knee:1,tilt:1}),
+ F('Drum Smash Parallel','Drum',['parallel','crush','drums'],{thr:-2,ratio:6,attack:3,release:2,knee:2,blend:2,mix:45}),
+ F('Mix Bus Glue','Mix',['glue','mix bus'],{thr:7,ratio:1,attack:6,release:2,knee:0,tilt:1,type:0}),
+ F('Hard Dance Master Glue','Master',['hard dance','master','glue'],{thr:4,ratio:1,attack:6,release:6,relVar:150,knee:0,tilt:2,type:0}),
+ F('Kick Duck Ext SC','Synth',['sidechain','pump','trance'],{thr:4,ratio:4,attack:0,release:6,relVar:140,knee:2,type:1,extSc:1,link:0}),
+ F('Bass Bus Tight','Bass',['tight','bass'],{thr:2,ratio:3,attack:4,release:1,knee:2,tilt:0}),
+ F('Vocal Bus Smooth','Vocal',['smooth','vocal'],{thr:3,ratio:2,attack:5,release:2,knee:0,tilt:1,type:0}),
+ F('Synth Bus Control','Synth',['leads','control'],{thr:4,ratio:2,attack:5,release:3,knee:1,tilt:2}),
+ F('Snare Snap','Drum',['snare','punch'],{thr:2,ratio:3,attack:5,release:0,knee:2,tilt:1,link:0}),
+ F('Slow Squeeze','Mix',['heavy','slow'],{thr:4,ratio:5,attack:4,release:5,knee:0,type:0,blend:1,mix:70}),
+ F('Peak Catch','Master',['limit','fast'],{thr:9,ratio:6,attack:0,release:0,knee:2}),
+ F('Old Feedback Warmth','Mix',['warm','smooth'],{thr:6,ratio:1,attack:6,release:3,knee:0,type:0,link:3}),
+ F('Bright Lift','FX',['bright','tilt'],{thr:2,ratio:2,attack:4,release:2,knee:1,tilt:2,blend:1,mix:60}),
+ F('Loose Link Glue','Mix',['wide','glue'],{thr:6,ratio:1,attack:5,release:3,knee:0,link:1,shape:2}),
+ F('Gentle Parallel Lift','Mix',['parallel','lift'],{thr:1,ratio:4,attack:5,release:3,knee:1,blend:2,mix:40})
+];
+let user=[];try{user=JSON.parse(localStorage.getItem('apurrr2500-presets')||'[]').filter(validPreset)}catch(e){user=[]}
+function validPreset(o){if(!o||typeof o!=='object'||typeof o.name!=='string'||!o.name||o.name.length>60||!o.p||typeof o.p!=='object')return false;
+ for(const k in o.p){if(!(k in LIM))continue;const v=o.p[k];if(typeof v!=='number'||!isFinite(v)||v<LIM[k][0]||v>LIM[k][1])return false}return true}
+function normPreset(o){const p=Object.assign({},DEF);for(const k in DEF)if(typeof o.p[k]==='number')p[k]=o.p[k];
+ return{name:String(o.name).slice(0,60),type:TYPES.includes(o.type)?o.type:'Mix',tags:Array.isArray(o.tags)?o.tags.filter(t=>typeof t==='string').slice(0,8).map(t=>t.slice(0,20)):[],p,factory:false}}
+function saveUser(){try{localStorage.setItem('apurrr2500-presets',JSON.stringify(user))}catch(e){}}
+const cur={name:'Start Here'};
+const allPresets=()=>FACTORY.concat(user);
+function curPreset(){return allPresets().find(x=>x.name===cur.name)||FACTORY[0]}
+function loadPreset(p){Object.assign(st,DEF,p.p);eng.resetLM();cur.name=p.name;syncUI();toast('Loaded '+p.name)}
+/* ============ DOM helpers ============ */
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,1600)}
+const app=$('#app'),stage=$('#stage'),frame=$('#frame');
+const eng=new Engine();
+function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+/* ============ Controls (built from data) ============ */
+const fmtMs=v=>v<1000?(v<10?v.toFixed(1):v.toFixed(0))+' ms':(v/1000).toFixed(2)+' s';
+const logMap={to:v=>Math.log(v/50)/Math.log(60),from:n=>50*Math.pow(60,n)};
+const KN={
+ thr:{lab:'Threshold',kc:'var(--g)',cont:true,lo:10,hi:-20,labs:[[0,'+10'],[.5,'-5'],[1,'-20']],def:4,tip:'Threshold: the level where the compressor starts turning the sound down. Try: lower it (turn right) until the gain reduction meter shows 2 to 4 dB on the loud parts. Range +10 to -20 dBu; 0 dBu is -22 dBFS here.',val:v=>`<b>${v>=0?'+':''}${v.toFixed(1)}</b> dB`},
+ ratio:{lab:'Ratio',kc:'var(--g)',steps:7,def:1,tip:'Ratio: how hard the sound over the threshold is pushed down. Try: 1.5 or 2 for glue on a whole mix, 4 for drums, 10 or Inf to catch peaks like a limiter.',val:i=>`<b>${RATL[i]}</b>`},
+ gain:{lab:'Make-up',kc:'var(--g)',cont:true,lo:0,hi:24,labs:[[0,'0'],[.5,'12'],[1,'+24']],def:0,tip:'Make-up: brings the level back up after compression, 0 to +24 dB, on Manual. On Auto it follows Threshold and Ratio. Try: use Level Match to compare fairly, because louder always sounds better.',val:v=>st.muMode?`<b>+${v.toFixed(1)}</b> dB`:`Auto <b>+${autoMu().toFixed(1)}</b> dB`},
+ attack:{lab:'Attack',kc:'var(--y)',steps:7,def:5,tip:'Attack: how fast the compressor grabs the sound, 0.03 ms (instant) to 30 ms (slow). Try: 10 or 30 ms keeps the punch of drums; 1 ms or less to tame sharp peaks.',val:i=>`<b>${ATKL[i]}</b>`},
+ release:{lab:'Release',kc:'var(--y)',steps:7,def:2,tip:'Release: how long the compressor takes to let go, 50 ms to 2 s. The last step, Var, uses the Var knob. Try: 100 to 200 ms so it breathes with the beat; longer for a smooth, slow glue.',val:i=>`<b>${i<6?(RELS[i]<1000?RELS[i]+' ms':RELS[i]/1000+' s'):'Var'}</b>`},
+ relVar:{lab:'Var',kc:'var(--y)',cont:true,lo:50,hi:3000,map:logMap,labs:[[0,'50'],[1,'3s']],def:150,tip:'Var: a smooth release time from 50 ms to 3 s. It only works when Release is on the Var step. Try: set it to match the tempo, about 150 ms at 140 BPM.',val:v=>`<b>${fmtMs(v)}</b>`},
+ mix:{lab:'Mix',kc:'var(--b)',cont:true,lo:0,hi:100,labs:[[0,'0'],[.5,'50'],[1,'100']],def:100,tip:'Mix: how much compressed sound is blended in. Its meaning depends on Blend, and it does nothing when Blend is 100%. Try: Par with Mix around 40 to 60 for parallel compression.',val:v=>`<b>${v.toFixed(0)}</b> %`},
+ link:{lab:'Link',kc:'var(--p)',steps:7,def:6,tip:'Link: how much the left and right channels share their gain reduction. IND keeps them apart; 100% turns both down together so the stereo image stays steady. Try: 100% for a mix, 50 to 70% for wide material.',val:i=>`<b>${LINKL[i]}</b>`}
+};
+function knobSVG(k){const cnt=k.steps||21;let s='<svg viewBox="0 0 150 150" aria-hidden="true">';
+ for(let i=0;i<cnt;i++){const f=i/(cnt-1),a=(-135+270*f)*Math.PI/180,major=k.steps?true:i%5===0,r1=major?63:67,r2=72;
+  s+=`<line x1="${75+Math.sin(a)*r1}" y1="${75-Math.cos(a)*r1}" x2="${75+Math.sin(a)*r2}" y2="${75-Math.cos(a)*r2}" stroke="${major?'#f4f5f7':'#8c8f99'}" stroke-width="${major?2.2:1.2}"/>`}
+ (k.labs||[]).forEach(([f,t])=>{const a=(-135+270*f)*Math.PI/180;s+=`<text x="${75+Math.sin(a)*54}" y="${75-Math.cos(a)*54+5}" text-anchor="middle" font-size="15" fill="#c9cbd3" font-family="Barlow Condensed,Arial Narrow,Arial,sans-serif" font-weight="600">${t}</text>`});
+ s+='<circle cx="75" cy="75" r="41" fill="#0b0b0d" style="stroke:var(--kc);stroke-width:3"/><g class="rot"><circle cx="75" cy="75" r="35" fill="url(#kcap)" stroke="#000"/><circle cx="75" cy="75" r="31" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="3" stroke-dasharray="1.6 2"/><line x1="75" y1="75" x2="75" y2="46" stroke="#f4f5f7" stroke-width="4.5" stroke-linecap="round"/></g></svg>';return s}
+const knobRefs={};
+function mkKnob(id){const k=KN[id],c=el('div','kc');c.style.setProperty('--kc',k.kc);c.innerHTML=`<div class="lab">${k.lab}</div>`;
+ const kn=el('div','knob',knobSVG(k));kn.tabIndex=0;kn.setAttribute('role','slider');kn.setAttribute('aria-label',k.lab);kn.dataset.tip=k.tip;
+ const v=el('div','kval');c.appendChild(kn);c.appendChild(v);knobRefs[id]={kn,v,k,c};
+ const toN=val=>k.steps?val/(k.steps-1):(k.map?k.map.to(val):(val-k.lo)/(k.hi-k.lo));
+ const fromN=n=>{n=clamp(n,0,1);return k.steps?Math.round(n*(k.steps-1)):(k.map?k.map.from(n):k.lo+n*(k.hi-k.lo))};
+ k.toN=toN;k.fromN=fromN;
+ let drag=null;
+ kn.addEventListener('pointerdown',e=>{kn.setPointerCapture(e.pointerId);drag={y:e.clientY,n:toN(st[id])};e.preventDefault();kn.focus()});
+ kn.addEventListener('pointermove',e=>{if(!drag)return;const sc=curScale()||1,d=-(e.clientY-drag.y)/sc;const per=k.steps?18*(k.steps-1):220;st[id]=fromN(drag.n+d/per*(e.shiftKey&&!k.steps?.1:1));syncUI()});
+ kn.addEventListener('pointerup',()=>drag=null);kn.addEventListener('pointercancel',()=>drag=null);
+ kn.addEventListener('dblclick',()=>{st[id]=k.def;syncUI()});
+ kn.addEventListener('wheel',e=>{e.preventDefault();const dir=e.deltaY<0?1:-1;st[id]=k.steps?clamp(st[id]+dir,0,k.steps-1):fromN(toN(st[id])+dir*(e.shiftKey?.002:.02));syncUI()},{passive:false});
+ kn.addEventListener('keydown',e=>{let dir=0;if(e.key==='ArrowUp'||e.key==='ArrowRight')dir=1;if(e.key==='ArrowDown'||e.key==='ArrowLeft')dir=-1;
+  if(dir){st[id]=k.steps?clamp(st[id]+dir,0,k.steps-1):fromN(toN(st[id])+dir*(e.shiftKey?.002:.01));syncUI();e.preventDefault()}
+  if(e.key==='Home'){st[id]=k.steps?0:fromN(0);syncUI()}if(e.key==='End'){st[id]=k.steps?k.steps-1:fromN(1);syncUI()}});
+ return c}
+const stripRefs={};
+function mkStrip(key,labels,tips){const s=el('div','strip');stripRefs[key]=labels.map((t,i)=>{const b=el('button','chip2',t);b.dataset.tip=tips[i]+(key==='attack'?' Try: slower steps keep punch.':key==='release'?' Try: match it to the beat.':key==='link'?' Try: higher for a steady image.':'');b.onclick=()=>{st[key]=i;syncUI()};s.appendChild(b);return b});return s}
+const segRefs={};
+function mkSeg(key,label,items){const w=el('div','seg');w.innerHTML=`<div class="sl">${label}</div>`;const r=el('div','sr');
+ segRefs[key]=items.map((it,i)=>{const b=el('button','sbtn',`<i></i><span>${it.t}</span>`);b.style.setProperty('--lc',it.c);b.dataset.tip=it.tip;b.setAttribute('aria-label',label+' '+it.t);b.onclick=()=>{st[key]=i;syncUI()};r.appendChild(b);return b});w.appendChild(r);return w}
+const tglRefs={};
+function mkTgl(key,label,color,tip){const b=el('button','sbtn tgl',`<i></i><span>${label}</span>`);b.style.setProperty('--lc',color);b.dataset.tip=tip;b.onclick=()=>{st[key]^=1;if(key==='levelMatch')eng.resetLM();syncUI()};tglRefs[key]=b;return b}
+const ctl=$('#ctl');
+function mkCol(title,sub,kc){const c=el('div','col');c.style.setProperty('--kc',kc);c.appendChild(el('div','sh',`<span>${title}</span><small>${sub}</small>`));ctl.appendChild(c);return c}
+const row=(...kids)=>{const r=el('div','krow');kids.forEach(k=>r.appendChild(k));return r};
+/* Column 1: Level */
+let c1=mkCol('Level','under the curve','var(--g)');
+c1.appendChild(row(mkKnob('thr'),mkKnob('ratio'),mkKnob('gain')));
+c1.appendChild(mkStrip('ratio',RATC,['1.5 to 1: very gentle. Try: mix bus glue.','2 to 1: light glue. Try: a full mix.','3 to 1: moderate control. Try: drum bus.','4 to 1: firm control. Try: drums and bass.','6 to 1: strong control. Try: parallel squash.','10 to 1: starts to act like a limiter. Try: peaks.','Infinity to 1: nothing gets past the threshold. Try: a safety catch on peaks.']));
+const thrLed=el('i','led');thrLed.dataset.tip='Threshold light: lights when the sound is over the threshold and compression is working. Try: set the Threshold so it flashes on the loud beats only.';thrLed.style.cssText='position:absolute;right:4px;top:28px';knobRefs.thr.c.appendChild(thrLed);
+const kneeSeg=mkSeg('knee','Knee',[{t:'Soft',c:'var(--g)',tip:'Soft knee: compression fades in gradually, so it is hard to hear. Try: Soft for glue on a full mix.'},{t:'Med',c:'var(--y)',tip:'Medium knee: compression fades in a little. Try: Med as a safe middle for most buses.'},{t:'Hard',c:'var(--r)',tip:'Hard knee: compression starts sharply at the threshold, so it is punchier and easier to hear. Try: Hard for drums and peak catching.'}]);
+const muSeg=mkSeg('muMode','Make-up',[{t:'Auto',c:'var(--g)',tip:'Auto make-up: the level comes back up by itself, based on Threshold and Ratio. Try: leave on Auto while you find the settings.'},{t:'Manual',c:'var(--y)',tip:'Manual make-up: you set the gain with the Make-up knob. Try: switch here when you want exact control. In Old type the detector hears the make-up too.'}]);
+muSeg.querySelectorAll('.sbtn').forEach(b=>b.style.width='56px');
+{const r=el('div','row2');r.style.justifyContent='space-between';r.style.marginTop='4px';r.appendChild(kneeSeg);r.appendChild(muSeg);c1.appendChild(r)}
+{const w=el('div','dcell');w.innerHTML='<div class="cap">Old vs New on a loud burst</div>';const cv=el('canvas');cv.id='cvStep';cv.width=300;cv.height=100;cv.dataset.tip='A test: a quiet tone, then a loud burst, then quiet again, run through your settings. Mint is New (detector before the compressor), yellow is Old (detector after it). It shows how much gain reduction each one applies over half a second. Try: Old lets the first moment through and settles gently; New grabs at once.';w.appendChild(cv);w.style.marginTop='6px';c1.appendChild(w)}
+/* Column 2: Detector */
+let c2=mkCol('Detector','under the filter','var(--p)');
+const tiltSeg=mkSeg('tilt','Tilt filter',[{t:'Norm',c:'var(--g)',tip:'Norm: the detector hears all frequencies equally, like a normal compressor. Try: start here.'},{t:'Med',c:'var(--y)',tip:'Med: the detector hears less bass and more treble, and the mids stay flat from 200 Hz to 3 kHz. Try: Med on a drum bus so the kick pumps the mix less.'},{t:'Loud',c:'var(--r)',tip:'Loud: a steady tilt, 15 dB less at 20 Hz and 15 dB more at 20 kHz (3 dB per octave). It only changes what the compressor listens to, not your sound. Try: Loud on a full mix to stop the bass from pumping everything.'}]);
+const typeSeg=mkSeg('type','Type',[{t:'Old',c:'var(--g)',tip:'Old: the detector listens to the sound after compression. Smoother and gentler, but a sudden loud hit gets through for a moment. Try: Old for glue and warmth. See the Old vs New display.'},{t:'New',c:'var(--y)',tip:'New: the detector listens to the sound before compression. It reacts faster, harder and more exactly. Try: New for drums and tight control. Needed for Ext SC.'}]);
+{const r=el('div','row2');r.style.justifyContent='space-between';r.appendChild(tiltSeg);r.appendChild(typeSeg);c2.appendChild(r)}
+const extT=mkTgl('extSc','Ext SC','var(--b)','Ext SC: the detector listens to another track, such as a kick, instead of this sound. It only works in Type New. Try: duck a bass or pad from the kick. This preview uses a built-in kick.');
+c2.appendChild(extT);
+const shapeSeg=mkSeg('shape','Link shape',[{t:'Fast',c:'var(--g)',tip:'Fast: the other channel\'s reduction arrives at once, so peaks link quickly. Try: Fast for a tight stereo image.'},{t:'Slow',c:'var(--g)',tip:'Slow: the other channel\'s reduction arrives gradually, so only longer swells link. Try: Slow for a livelier, wider sound.'},{t:'Both',c:'var(--g)',tip:'Both: the linking is even slower and very subtle. Try: Both with a Link of 50 to 70% for gentle width.'}]);
+{const r=el('div','row2');r.style.justifyContent='space-between';r.appendChild(mkKnob('link'));r.appendChild(shapeSeg);c2.appendChild(r)}
+c2.appendChild(mkStrip('link',LINKC,['Independent: left and right never share. Try: IND for dual-mono tracks.','Linked 50%: half shared.','Linked 60%.','Linked 70%.','Linked 80%.','Linked 90%.','Linked 100%: both channels always turn down by the same amount, which keeps the stereo image in place. Try: 100% on mix buses.']));
+/* Column 3: Time */
+let c3=mkCol('Time','under the history','var(--y)');
+c3.appendChild(row(mkKnob('attack'),mkKnob('release'),mkKnob('relVar')));
+c3.appendChild(mkStrip('attack',ATKC,['0.03 ms: instant, grabs everything.','0.1 ms: very fast.','0.3 ms: fast.','1 ms: fast but lets the very start through.','3 ms: lets a little punch through.','10 ms: keeps the punch of drums.','30 ms: slow, keeps nearly all the transient.']));
+c3.appendChild(mkStrip('release',RELC,['50 ms: very fast recovery.','100 ms: fast, good for drums.','200 ms: medium.','500 ms: slow, smooth.','1 second: slow.','2 seconds: very slow, sustained squeeze.','Var: use the small Var knob for 50 ms to 3 s.']));
+const blendSeg=mkSeg('blend','Blend',[{t:'100%',c:'var(--g)',tip:'100%: all of the sound is compressed and Mix is not used. Try: start here.'},{t:'X-fade',c:'var(--y)',tip:'X-fade: Mix fades from the untouched sound (0) to the compressed sound (100). Try: 50 to hear both together without getting louder.'},{t:'Par',c:'var(--b)',tip:'Par: the compressed sound is added on top of the untouched sound (louder). It keeps the punch and adds weight. Try: a hard squash (Ratio 6 or more, Soft knee) with Mix near 50 to 60.'}]);
+blendSeg.querySelectorAll('.sbtn').forEach(b=>b.style.width='56px');
+{const r=el('div','row2');r.style.justifyContent='space-between';r.style.marginTop='4px';r.appendChild(blendSeg);r.appendChild(mkKnob('mix'));c3.appendChild(r)}
+/* Column 4: Meter */
+let c4=mkCol('Meter','under the needles','var(--b)');
+c4.appendChild(mkSeg('meter','Meter shows',[{t:'GR',c:'var(--r)',tip:'GR: shows how many dB the compressor is turning the sound down, 0 at the right. Try: aim for 2 to 4 dB of movement on a mix bus.'},{t:'Out',c:'var(--y)',tip:'Out: shows the output level in dB (0 VU is -18 dBFS). Try: watch it when matching the level with and without compression.'},{t:'In',c:'var(--g)',tip:'In: shows the input level in dB (0 VU is -18 dBFS). Try: check that the sound is not too quiet for the Threshold to catch.'}]));
+c4.appendChild(mkTgl('inSw','IN','var(--g)','IN: turns the compression on or off with no click, while the sound keeps passing. Try: flick it while listening to hear what the compressor adds. (Bypass in the header switches off the whole plugin.)'));
+c4.appendChild(mkTgl('levelMatch','Level Match','var(--b)','Level Match: slowly changes the output so the compressed sound is as loud as the untouched sound, for a fair comparison. Try: turn it on while you compare with IN, then off.'));
+{const p=el('div','plate','<div class="pt">Apurrr2500</div><div class="ps">Stereo bus compressor</div><svg width="120" height="34" viewBox="0 0 120 34" aria-hidden="true"><path d="M4 28 Q20 4 36 20 T68 14 T100 22 Q112 24 116 10" fill="none" stroke="#FF7BB1" stroke-width="3" stroke-linecap="round"/><circle cx="116" cy="10" r="3.5" fill="#FBBDD0"/></svg><div class="ps">Studio 87</div>');p.dataset.tip='Name plate. The curly line is a cat tail.';p.style.marginTop='6px';c4.appendChild(p)}
+/* ============ Sync UI from state ============ */
+function syncUI(){
+ for(const id in knobRefs){const r=knobRefs[id],k=r.k,n=k.toN(st[id]);r.kn.querySelector('.rot').setAttribute('transform','rotate('+(-135+270*n)+' 75 75)');r.v.innerHTML=k.val(st[id]);r.kn.setAttribute('aria-valuenow',String(st[id]))}
+ knobRefs.gain.c.classList.toggle('off',!st.muMode);knobRefs.mix.c.classList.toggle('off',st.blend===0);knobRefs.relVar.c.classList.toggle('off',st.release<6);
+ for(const k in stripRefs)stripRefs[k].forEach((b,i)=>b.classList.toggle('on',st[k]===i));
+ for(const k in segRefs)segRefs[k].forEach((b,i)=>b.classList.toggle('on',st[k]===i));
+ for(const k in tglRefs)tglRefs[k].classList.toggle('on',!!st[k]);
+ extT.classList.toggle('dis',st.type!==1);
+ {const bb=$('#bBypass');bb.classList.toggle('on',!!st.bypass);bb.setAttribute('aria-pressed',st.bypass?'true':'false')}
+ const names=['gain reduction','output level','input level'];$('#mCap').textContent='Meter: '+names[st.meter];
+ eng.setP(core());stepDirty=true;if(!st.levelMatch)eng.resetLM();
+ $('#pName').textContent=cur.name+(isDirty()?' *':'');
+}
+function isDirty(){const p=curPreset();for(const k of PKEYS)if(Math.abs((p.p[k]||0)-st[k])>1e-6)return true;return false}
+/* ============ Wood (same three colours and vertical grain as the PurrOne wood) ============ */
+function mul32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function drawWood(cv,seed,edgeRight){const w=cv.width=104,h=cv.height=1280,g=cv.getContext('2d'),r=mul32(seed);
+ g.fillStyle='#3d2210';g.fillRect(0,0,w,h);
+ for(let x=0;x<w;x++){const a=r();g.fillStyle='rgba(123,74,38,'+(.40*(.4+.6*a))+')';g.fillRect(x,0,1,h);
+  if(r()<.35){g.fillStyle='rgba(90,52,25,'+(.75*r())+')';const y0=r()*h;g.fillRect(x,y0,1,h*(.2+.6*r()))}
+  if(r()<.12){g.fillStyle='rgba(0,0,0,.35)';g.fillRect(x,0,1,h)}}
+ g.fillStyle='#000';g.fillRect(edgeRight?0:w-3,0,3,h)}
+drawWood($('#cheekL canvas'),11,true);drawWood($('#cheekR canvas'),29,false);
+/* ============ Meters and displays ============ */
+function tokens(){const c=getComputedStyle(app);return{disp:c.getPropertyValue('--disp').trim(),line:c.getPropertyValue('--line').trim(),dim:c.getPropertyValue('--dim').trim(),acc:c.getPropertyValue('--accent').trim(),ink:c.getPropertyValue('--ink').trim(),title:c.getPropertyValue('--title').trim(),pink:'#FF7BB1',g:c.getPropertyValue('--g').trim(),y:c.getPropertyValue('--y').trim()}}
+let T=tokens();
+const clipLatch={in:false,out:false};
+const FONT='9px JetBrains Mono,monospace';
+function drawMeter(cv,lin,key){const g=cv.getContext('2d'),w=cv.width,h=cv.height,mn=-60,mx=6,y=db=>h-6-(Math.min(mx,Math.max(mn,db))-mn)/(mx-mn)*(h-12);
+ g.clearRect(0,0,w,h);g.fillStyle=T.disp;g.fillRect(0,0,w,h);
+ const db=L2D(lin),top=y(db);
+ const grad=g.createLinearGradient(0,y(mn),0,y(mx));const f=db2=>(db2-mn)/(mx-mn);
+ grad.addColorStop(0,'#6CC9F5');grad.addColorStop(f(-12),'#6CC9F5');grad.addColorStop(f(-12)+.001,'#A43DFF');grad.addColorStop(f(0),'#A43DFF');grad.addColorStop(f(0)+.001,'#FF1383');grad.addColorStop(1,'#FF1383');
+ g.fillStyle=grad;g.fillRect(2,top,12,y(mn)-top);
+ g.fillStyle=T.dim;g.font=FONT;g.textAlign='right';
+ for(const t of[0,-6,-12,-24,-36,-48]){const yy=y(t);g.fillRect(14,yy,3,1);g.fillText(String(t),w-1,yy+3)}
+ if(db>=0)clipLatch[key]=true;g.fillStyle=clipLatch[key]?'#FF1383':'#2a2c31';g.fillRect(2,0,12,4)}
+function drawGRMeter(cv){const g=cv.getContext('2d'),w=cv.width,h=cv.height,mx=20,y=d=>6+Math.min(mx,Math.max(0,d))/mx*(h-12);
+ g.clearRect(0,0,w,h);g.fillStyle=T.disp;g.fillRect(0,0,w,h);
+ [[eng.grL,2],[eng.grR,8]].forEach(([v,x],i)=>{g.fillStyle=i?T.pink:T.g;g.fillRect(x,6,5,y(v)-6)});
+ g.fillStyle=T.dim;g.font=FONT;g.textAlign='right';
+ for(const t of[0,1,2,3,6,10,15,20]){const yy=y(t);g.fillRect(14,yy,3,1);g.fillText(String(t),w-1,yy+3)}}
+const NH=360,histL=new Float32Array(NH),histR=new Float32Array(NH);let hi=0;
+function drawCurve(){const cv=$('#cvCurve'),g=cv.getContext('2d'),w=cv.width,h=cv.height;g.fillStyle=T.disp;g.fillRect(0,0,w,h);
+ const x0=-60,x1=0,y0=-60,y1=12,X=v=>26+(v-x0)/(x1-x0)*(w-34),Y=v=>h-14-(v-y0)/(y1-y0)*(h-22);
+ g.strokeStyle=T.line;g.lineWidth=1;g.fillStyle=T.dim;g.font=FONT;g.textAlign='center';
+ for(const v of[-60,-48,-36,-24,-12,0]){g.beginPath();g.moveTo(X(v),4);g.lineTo(X(v),h-14);g.stroke();g.fillText(v,X(v),h-4)}
+ g.textAlign='right';for(const v of[-48,-24,0,12]){g.beginPath();g.moveTo(26,Y(v));g.lineTo(w-6,Y(v));g.stroke();g.fillText(v,23,Y(v)+3)}
+ g.strokeStyle='#4a4d55';g.setLineDash([3,3]);g.beginPath();g.moveTo(X(-60),Y(-60));g.lineTo(X(0),Y(0));g.stroke();g.setLineDash([]);
+ const p=eng.p;
+ g.fillStyle='rgba(164,61,255,.18)';g.fillRect(X(p.thr-p.w/2),4,Math.max(2,X(p.thr+p.w/2)-X(p.thr-p.w/2)),h-18);
+ g.strokeStyle=T.pink;g.setLineDash([2,3]);g.beginPath();g.moveTo(X(p.thr),4);g.lineTo(X(p.thr),h-14);g.stroke();g.setLineDash([]);
+ g.strokeStyle=T.acc;g.lineWidth=2;g.beginPath();
+ for(let v=x0;v<=x1;v+=.5){const o=p.bypass?v:staticOut(v,p);(v===x0?g.moveTo:g.lineTo).call(g,X(v),Y(clamp(o,y0,y1)))}g.stroke();
+ const li=L2D(eng.inPk),lo=L2D(eng.outPk);if(isFinite(li)&&li>-60){g.fillStyle='#fff';g.beginPath();g.arc(X(Math.min(x1,li)),Y(clamp(lo,y0,y1)),4,0,7);g.fill()}}
+function drawFilt(){const cv=$('#cvFilt'),g=cv.getContext('2d'),w=cv.width,h=cv.height;g.fillStyle=T.disp;g.fillRect(0,0,w,h);
+ const f0=20,f1=20000,X=f=>26+Math.log(f/f0)/Math.log(f1/f0)*(w-34),Y=d=>h-14-(d+20)/(40)*(h-22);
+ g.strokeStyle=T.line;g.fillStyle=T.dim;g.font=FONT;g.textAlign='center';g.lineWidth=1;
+ for(const f of[20,100,1000,10000]){g.beginPath();g.moveTo(X(f),4);g.lineTo(X(f),h-14);g.stroke();g.fillText(f>=1000?(f/1000)+'k':f,X(f),h-4)}
+ g.textAlign='right';for(const d of[-15,0,15]){g.beginPath();g.moveTo(26,Y(d));g.lineTo(w-6,Y(d));g.stroke();g.fillText((d>0?'+':'')+d,23,Y(d)+3)}
+ g.strokeStyle=T.acc;g.lineWidth=2;g.beginPath();
+ for(let i=0;i<=120;i++){const f=f0*Math.pow(f1/f0,i/120),d=clamp(L2D(eng.tiltMag(f)),-20,20);(i?g.lineTo:g.moveTo).call(g,X(f),Y(d))}g.stroke();
+ g.fillStyle=T.ink;g.textAlign='left';g.font='11px JetBrains Mono,monospace';g.fillText(['Norm','Med','Loud'][st.tilt]+(st.type===1&&st.extSc?' · Ext SC':''),32,14)}
+function drawHist(){const cv=$('#cvHist'),g=cv.getContext('2d'),w=cv.width,h=cv.height;g.fillStyle=T.disp;g.fillRect(0,0,w,h);
+ const Y=d=>8+d/20*(h-24);g.strokeStyle=T.line;g.fillStyle=T.dim;g.font=FONT;g.textAlign='right';g.lineWidth=1;
+ for(const d of[0,5,10,15,20]){g.beginPath();g.moveTo(26,Y(d));g.lineTo(w-4,Y(d));g.stroke();g.fillText(d?'-'+d:'0',23,Y(d)+3)}
+ g.beginPath();g.moveTo(28,Y(0));for(let i=0;i<NH;i++){const v=histL[(hi+i)%NH];g.lineTo(28+i/(NH-1)*(w-32),Y(Math.min(20,v)))}g.lineTo(w-4,Y(0));g.closePath();
+ g.fillStyle='rgba(2,235,186,.28)';g.fill();g.strokeStyle=T.g;g.lineWidth=1.6;g.stroke();
+ g.strokeStyle=T.pink;g.setLineDash([4,3]);g.lineWidth=1.2;g.beginPath();for(let i=0;i<NH;i++){const v=histR[(hi+i)%NH],x=28+i/(NH-1)*(w-32);(i?g.lineTo:g.moveTo).call(g,x,Y(Math.min(20,v)))}g.stroke();g.setLineDash([]);
+ g.fillStyle=T.ink;g.textAlign='left';g.font='11px JetBrains Mono,monospace';g.fillText('GR '+eng.grPk.toFixed(1)+' dB',32,h-6)}
+/* needle meter */
+const nd={v:[0,0]};
+function drawNeedle(dt){const cv=$('#cvNeedle'),g=cv.getContext('2d'),w=cv.width,h=cv.height;g.fillStyle=T.disp;g.fillRect(0,0,w,h);
+ const m=st.meter,gr=m===0,lo=gr?0:-20,hiV=gr?20:3;
+ const cx=w/2,cy=h+44,R=118,A=gr?-1:1,span=50*Math.PI/180;
+ /* value to angle; GR has 0 at the right */
+ const ang=val=>{const f=gr?1-(clamp(val,0,20))/20:(clamp(val,-20,3)+20)/23;return -span+2*span*f};
+ const P=(a,r)=>[cx+Math.sin(a)*r,cy-Math.cos(a)*r];
+ const ticks=gr?[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]:[-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3];
+ const labs=gr?[0,3,5,10,15,20]:[-20,-10,-5,0,3];
+ g.lineWidth=1;
+ /* red zone arc */
+ const zFrom=gr?ang(3):ang(0),zTo=gr?ang(0):ang(3);
+ g.strokeStyle='#FF1383';g.lineWidth=3;g.beginPath();g.arc(cx,cy,R,-Math.PI/2+Math.min(zFrom,zTo),-Math.PI/2+Math.max(zFrom,zTo));g.stroke();
+ g.strokeStyle=T.dim;g.lineWidth=1.2;g.beginPath();g.arc(cx,cy,R,-Math.PI/2-span,-Math.PI/2+span);g.stroke();
+ g.fillStyle=T.dim;g.font=FONT;g.textAlign='center';
+ ticks.forEach(t=>{const a=ang(t),major=labs.includes(t),p1=P(a,R),p2=P(a,R-(major?9:5));g.strokeStyle=major?T.ink:T.dim;g.lineWidth=major?1.5:1;g.beginPath();g.moveTo(p1[0],p1[1]);g.lineTo(p2[0],p2[1]);g.stroke()});
+ g.fillStyle=T.ink;labs.forEach(t=>{const a=ang(t),p=P(a,R+11);g.fillText((!gr&&t>0?'+':'')+t,p[0],p[1]+3)});
+ g.fillStyle=T.dim;g.font='10px JetBrains Mono,monospace';g.textAlign='left';g.fillText(gr?'dB GR':'dB VU',4,h-6);
+ /* values */
+ let vals;if(gr)vals=[eng.grL,eng.grR];else{const a=m===1?eng.aOut:eng.aIn;vals=[10*Math.log10(Math.max(a[0],1e-10))+settings.ref,10*Math.log10(Math.max(a[1],1e-10))+settings.ref]}
+ const k=gr?1:1-Math.exp(-dt/0.05);
+ [0,1].forEach(c=>{nd.v[c]+=(vals[c]-nd.v[c])*(gr?1:Math.min(1,k*3));
+  const a=ang(nd.v[c]),p1=P(a,R-14),p2=P(a,R+2);g.strokeStyle=c?T.pink:T.g;g.lineWidth=2;g.beginPath();const b=P(a,R-62+c*6);g.moveTo(b[0],b[1]);g.lineTo(p2[0],p2[1]);g.stroke()});
+ g.textAlign='right';g.font='11px JetBrains Mono,monospace';
+ const f=v=>(v>=0?'+':'')+v.toFixed(1);g.fillStyle=T.g;g.fillText('L '+(gr?vals[0].toFixed(1):f(vals[0])),w-4,h-20);g.fillStyle=T.pink;g.fillText('R '+(gr?vals[1].toFixed(1):f(vals[1])),w-4,h-6)}
+var stepDirty=true;
+function stepRun(fb){const e=new Engine();e.prepare(48000);const q=Object.assign({},core(),{fb,ext:false,bypass:false,levelMatch:false,blend:0});e.setP(q,true);e.curMu=e.tMu;const n=24000,out=new Float32Array(n/100|0),L=new Float32Array(100),R=new Float32Array(100);
+ for(let b=0;b<n/100;b++){for(let i=0;i<100;i++){const k=b*100+i,t=k/48000,amp=(t>=.1&&t<.3)?D2L(-10):D2L(-34);L[i]=R[i]=amp*Math.sin(2*Math.PI*1000*t)*1.414}e.process(L,R,100,null);out[b]=e.grPk}return out}
+function drawStep(){if(!stepDirty)return;stepDirty=false;const cv=$('#cvStep'),g=cv.getContext('2d'),w=cv.width,h=cv.height;g.fillStyle=T.disp;g.fillRect(0,0,w,h);
+ const runs=[[false,T.g],[true,T.y]].map(([fb,col])=>[stepRun(fb),col]);let mx=0;runs.forEach(([o])=>o.forEach(v=>{mx=Math.max(mx,v)}));const top=Math.max(6,Math.ceil(mx/6)*6);
+ const X=t=>28+t/.5*(w-34),Y=d=>6+Math.min(top,d)/top*(h-24);
+ g.fillStyle='rgba(164,61,255,.16)';g.fillRect(X(.1),4,X(.3)-X(.1),h-18);
+ g.strokeStyle=T.line;g.fillStyle=T.dim;g.font=FONT;g.lineWidth=1;g.textAlign='right';for(let d=0;d<=top;d+=top/3){g.beginPath();g.moveTo(28,Y(d));g.lineTo(w-4,Y(d));g.stroke();g.fillText(d?'-'+d:'0',25,Y(d)+3)}
+ g.textAlign='center';for(const t of[0,.1,.2,.3,.4,.5]){g.fillText(Math.round(t*1000),X(t),h-3)}
+ runs.forEach(([o,col])=>{g.strokeStyle=col;g.lineWidth=2;g.beginPath();o.forEach((v,i)=>{const x=X(i*100/48000),y=Y(v);i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()});
+ g.textAlign='left';g.fillStyle=T.g;g.fillText('New',32,h-14);g.fillStyle=T.y;g.fillText('Old',58,h-14);g.fillStyle=T.dim;g.fillText('ms',w-18,h-14)}
+function drawLeds(){const gr=eng.grPk;thrLed.classList.toggle('on',gr>.15&&!st.bypass);thrLed.style.opacity=gr>.15?String(.45+Math.min(.55,gr/10)):'1'}
+/* ============ Audio preview + animation loop ============ */
+let ctx=null,node=null,playing=false,pos=0,lastT=0,visible=true,srcKind='mix';
+function startAudio(){if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();eng.prepare(ctx.sampleRate);eng.setAvg(settings.needle);
+  node=ctx.createScriptProcessor(1024,0,2);const bl=new Float32Array(1024),br=new Float32Array(1024),bs=new Float32Array(1024);
+  node.onaudioprocess=e=>{const o0=e.outputBuffer.getChannelData(0),o1=e.outputBuffer.getChannelData(1),n=o0.length;fillSrc(srcKind,pos,n,bl,br,ctx.sampleRate);fillSc(pos,n,bs,ctx.sampleRate);pos+=n;
+   for(let i=0;i<n;i++){bl[i]*=.55;br[i]*=.55}eng.process(bl,br,n,bs);o0.set(bl.subarray(0,n));o1.set(br.subarray(0,n))};
+  node.connect(ctx.destination)}
+ ctx.resume();playing=true;$('#rigPlay').innerHTML='&#9632; Stop preview';$('#rigPlay').classList.add('on')}
+function stopAudio(){if(ctx)ctx.suspend();playing=false;$('#rigPlay').innerHTML='&#9654; Play preview';$('#rigPlay').classList.remove('on')}
+$('#rigPlay').onclick=()=>playing?stopAudio():startAudio();
+$('#rigSrc').onchange=e=>{srcKind=e.target.value;if(srcKind==='file'&&!fileBuf)$('#rigFileIn').click()};
+$('#rigFile').onclick=()=>$('#rigFileIn').click();
+$('#rigFileIn').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const c=new (window.AudioContext||window.webkitAudioContext)();const b=await c.decodeAudioData(await f.arrayBuffer());
+  const d=b.getChannelData(0),m=new Float32Array(d.length);let pk=0;for(let i=0;i<d.length;i++){m[i]=d[i];pk=Math.max(pk,Math.abs(d[i]))}const k=pk>0?.9/pk:1;for(let i=0;i<m.length;i++)m[i]*=k;
+  fileBuf=m;srcKind='file';$('#rigSrc').value='file';toast('Loaded '+f.name.slice(0,30));c.close()}catch(err){toast('Could not read that file')}};
+const sl=new Float32Array(2048),sr=new Float32Array(2048),ss=new Float32Array(2048);
+function frameLoop(t){requestAnimationFrame(frameLoop);if(!visible||document.hidden){lastT=t;return}
+ const minGap=settings.power?1000/16:0;if(t-lastT<minGap&&lastT)return;const dt=Math.min(.1,(t-lastT)/1000||1/60);lastT=t;
+ if(!playing){const fs=eng.fs,n=Math.min(2048,Math.round(fs*dt));fillSrc(srcKind,pos,n,sl,sr,fs);fillSc(pos,n,ss,fs);pos+=n;for(let i=0;i<n;i++){sl[i]*=.55;sr[i]*=.55}eng.process(sl,sr,n,ss)}
+ histL[hi]=eng.grLp||0;histR[hi]=eng.grRp||0;hi=(hi+1)%NH;
+ drawMeter($('#cvIn'),eng.inPk,'in');drawMeter($('#cvOut'),eng.outPk,'out');drawGRMeter($('#cvGR'));
+ $('#pkIn').textContent=eng.inPk>1e-4?L2D(eng.inPk).toFixed(1):'-inf';$('#pkOut').textContent=eng.outPk>1e-4?L2D(eng.outPk).toFixed(1):'-inf';$('#pkGR').textContent=eng.grPk.toFixed(1);
+ drawCurve();drawFilt();drawHist();drawNeedle(dt);drawStep();drawLeds();
+ {const lg=L2D(eng.lm);const b=tglRefs.levelMatch;b.lastChild.textContent=st.levelMatch?'Level Match '+(lg>=0?'+':'')+lg.toFixed(1)+' dB':'Level Match'}}
+$('#cvIn').onclick=()=>clipLatch.in=false;$('#cvOut').onclick=()=>clipLatch.out=false;
+new IntersectionObserver(es=>{visible=es[0].isIntersecting}).observe(frame);
+/* ============ Modals ============ */
+const modal=$('#modal');
+function openModal(title,body,foot,wide){modal.innerHTML='';modal.hidden=false;const d=el('div','dlg');if(wide)d.style.width=wide;const h=el('h2','',esc(title));const x=el('button','btn','Close');x.onclick=closeModal;h.appendChild(x);
+ d.appendChild(h);const b=el('div','dbody');if(typeof body==='string')b.innerHTML=body;else b.appendChild(body);d.appendChild(b);if(foot){const f=el('div','dfoot');foot.forEach(a=>f.appendChild(a));d.appendChild(f)}modal.appendChild(d);return b}
+function closeModal(){modal.hidden=true;modal.innerHTML=''}
+modal.addEventListener('pointerdown',e=>{if(e.target===modal)closeModal()});
+const btn=(t,fn,c)=>{const b=el('button','btn'+(c?' '+c:''),t);b.onclick=fn;return b};
+function applySettings(){app.dataset.look=settings.look;T=tokens();stepDirty=true;eng.setAvg(settings.needle);try{localStorage.setItem('apurrr2500-settings',JSON.stringify(settings))}catch(e){}}
+applySettings();
+$('#bSettings').onclick=()=>{const b=openModal('Settings','<label><input type="checkbox" id="sTips"> Info bubbles after hovering for about one second</label><label><input type="checkbox" id="sPow"> Power saving (redraw at 16 frames per second)</label><label>Colour look <select id="sLook"><option value="C">Look C, charcoal and white (default)</option><option value="A">Look A, neon navy</option><option value="B">Look B, purple soda pop</option></select></label><p style="color:var(--dim)">The look is saved with the plugin settings, not with each preset. Wood, cat logo, meter colours and dB scales stay the same in all three.</p><label>Needle speed <select id="sNd"><option value="300">Slow, 300 ms (VU style)</option><option value="50">Fast, 50 ms</option></select></label><label>Needle 0 VU at <select id="sRef"><option value="18">-18 dBFS (default)</option><option value="16">-16 dBFS</option><option value="14">-14 dBFS</option></select></label><p style="color:var(--dim)">This only moves the needle scale. It never changes the sound or the Threshold.</p><label><button class="btn" id="sReset">Reset window to 100%</button></label>',null);
+ b.querySelector('#sTips').checked=settings.tips;b.querySelector('#sPow').checked=settings.power;b.querySelector('#sLook').value=settings.look;b.querySelector('#sNd').value=String(settings.needle);b.querySelector('#sRef').value=String(settings.ref);
+ b.querySelector('#sTips').onchange=e=>{settings.tips=e.target.checked;applySettings()};b.querySelector('#sPow').onchange=e=>{settings.power=e.target.checked;applySettings()};
+ b.querySelector('#sLook').onchange=e=>{settings.look=e.target.value;applySettings()};
+ b.querySelector('#sNd').onchange=e=>{settings.needle=+e.target.value;applySettings()};b.querySelector('#sRef').onchange=e=>{settings.ref=+e.target.value;applySettings()};
+ b.querySelector('#sReset').onclick=()=>{setScale(s0);toast('Window reset to 100%')}};
+$('#bGuide').onclick=()=>openModal('Guide',`<p><b>What this box is for:</b> a bus compressor glues several sounds into one. It turns the loud parts down a little so the drums, bass and synths move together, and then brings the level back up. Use it on a drum bus, on the whole mix, or in parallel to add weight.</p>
+<p><b>How it listens:</b> the detector (through the Tilt filter) decides how much to turn the sound down. Type Old listens after the compression, New listens before it. Link shares the reduction between left and right. Make-up brings the level back, and Blend mixes the result with the untouched sound.</p>
+<table><tr><td><b>Drum bus</b></td><td>Ratio 3, Attack 10 ms, Release 200 ms (or 100), Knee Med, Tilt Med, Type New, Link 100. Lower Threshold until the GR meter shows 2 to 4 dB. Preset: Drum Bus Glue.</td></tr>
+<tr><td><b>Mix bus</b></td><td>Ratio 1.5, Attack 30 ms, Release 200 ms, Knee Soft, Tilt Med, Type Old, Link 100. Only 1 to 2 dB of reduction. Preset: Mix Bus Glue.</td></tr>
+<tr><td><b>Parallel crush</b></td><td>Ratio 6, Attack 3 ms, Release 200 ms, Knee Soft, Blend Par, Mix about 45. Squash 10 dB or more, then blend it in under the clean sound. Preset: Drum Smash Parallel.</td></tr></table>
+<p>Tip: turn Level Match on while you compare with IN, so a louder sound does not fool you. These are starting points, trust your ears.</p>
+<table><tr><td><kbd>Space</kbd></td><td>Start or stop the preview</td></tr><tr><td><kbd>B</kbd></td><td>Bypass on or off</td></tr><tr><td><kbd>I</kbd></td><td>IN on or off (compression only)</td></tr><tr><td><kbd>K</kbd></td><td>Next knee</td></tr><tr><td><kbd>T</kbd></td><td>Next Tilt filter</td></tr><tr><td><kbd>Y</kbd></td><td>Old or New type</td></tr><tr><td><kbd>R</kbd> / <kbd>Shift+R</kbd></td><td>Next or previous ratio</td></tr><tr><td><kbd>M</kbd></td><td>Next meter source</td></tr><tr><td>Knob: drag, wheel, arrows</td><td>Hold <kbd>Shift</kbd> for fine steps on smooth knobs, double-click to reset</td></tr><tr><td>Wood cheeks</td><td>Double-click to reset the window to 100%</td></tr></table>`,null,'820px');
+$('#bAbout').onclick=()=>openModal('About & Support',`<p><b>Apurrr2500</b> by Studio 87, version 0.2 (design mockup). Free and open source, licence AGPL-3.0-or-later. Collects nothing and never uses the network.</p>
+<p>A free open source stereo bus compressor inspired by classic hardware and written from public manuals.</p>
+<div class="links"><a href="https://github.com/SpeakingColors/Apurrr2500" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/SpeakingColors/Apurrr2500/releases" target="_blank" rel="noopener">Releases</a><a href="https://ko-fi.com/studio87" target="_blank" rel="noopener">Ko-fi studio87</a></div>
+<p><b>Your presets are saved here:</b><br>Linux <kbd>~/.local/share/Studio 87/Apurrr2500/presets</kbd><br>Windows <kbd>%APPDATA%\\Studio 87\\Apurrr2500\\presets</kbd><br>macOS <kbd>~/Library/Application Support/Studio 87/Apurrr2500/presets</kbd></p>
+<p><b>Install and uninstall:</b> the installer puts the VST3 in the standard folder for your system and works offline. The uninstaller removes everything it installed and asks before touching your presets (it keeps them by default).</p>
+<p>Support is entirely optional. Nothing is locked.</p>`,null);
+/* Preset browser */
+let pbSel=null,pbType='All',pbQ='';
+const sumP=p=>RATL[p.ratio]+' · Thr '+p.thr+' · Atk '+ATKL[p.attack]+' · Rel '+(p.release<6?RELS[p.release]+' ms':'Var')+' · '+['Soft','Med','Hard'][p.knee]+' knee · Tilt '+['Norm','Med','Loud'][p.tilt]+' · '+(p.type?'New':'Old');
+function openBrowser(){pbSel=pbSel||cur.name;const wrap=el('div','');wrap.innerHTML='<div class="pb"><div style="display:flex;flex-direction:column;min-height:0"><input id="pbQ" placeholder="Search name, type or tag" style="margin-bottom:6px"><div class="chips" id="pbChips"></div><div class="list" id="pbList" style="flex:1"></div></div><div id="pbSide"></div></div>';
+ const b=openModal('Presets',wrap,[btn('Import',openImport),btn('Export all',()=>openExport(null)),btn('Save current',()=>{closeModal();openSave()})],'820px');
+ const q=b.querySelector('#pbQ');q.value=pbQ;q.oninput=()=>{pbQ=q.value;renderList()};
+ function renderList(){const ch=b.querySelector('#pbChips');ch.innerHTML='';['All'].concat(TYPES).forEach(t=>{const c=el('button','chip'+(pbType===t?' on':''),t);c.onclick=()=>{pbType=t;renderList()};ch.appendChild(c)});
+  const l=b.querySelector('#pbList');l.innerHTML='';const qq=pbQ.toLowerCase();
+  allPresets().filter(p=>(pbType==='All'||p.type===pbType)&&(!qq||(p.name+' '+p.type+' '+p.tags.join(' ')).toLowerCase().includes(qq))).forEach(p=>{
+   const it=el('div','item'+(pbSel===p.name?' sel':''),'<span>'+esc(p.name)+'</span><small>'+(p.factory?p.type:'mine &middot; '+p.type)+'</small>');it.onclick=()=>{pbSel=p.name;renderList()};it.ondblclick=()=>{loadPreset(p);closeModal()};l.appendChild(it)});
+  const p=allPresets().find(x=>x.name===pbSel),s=b.querySelector('#pbSide');s.innerHTML='';if(!p)return;
+  s.innerHTML='<h3 style="margin:0 0 4px">'+esc(p.name)+'</h3><div style="color:var(--dim)">'+p.type+(p.tags.length?' &middot; '+p.tags.map(esc).join(', '):'')+(p.factory?' &middot; factory':' &middot; yours')+'</div><p style="color:var(--dim)">'+sumP(p.p)+'</p>';
+  const row=el('div',''),mk=(t,f)=>{const x=btn(t,f);x.style.margin='0 6px 6px 0';row.appendChild(x)};
+  mk('Load',()=>{loadPreset(p);closeModal()});mk('Export',()=>openExport(p));
+  if(!p.factory){mk('Edit properties',()=>openSave(p));mk('Delete',()=>{user=user.filter(x=>x!==p);saveUser();if(cur.name===p.name){cur.name='Start Here'}pbSel=null;syncUI();renderList()})}
+  s.appendChild(row)}
+ renderList()}
+$('#pName').onclick=openBrowser;
+$('#pName').ondblclick=()=>{const p=curPreset();if(p.factory){toast('Save a copy first, factory presets cannot be renamed');return}openSave(p)};
+$('#pPrev').onclick=()=>step(-1);$('#pNext').onclick=()=>step(1);
+function step(d){const a=allPresets();let i=a.findIndex(p=>p.name===cur.name);i=(i+d+a.length)%a.length;loadPreset(a[i])}
+function openSave(edit){const p0=edit||null;const body=el('div','','<label>Name <input id="svN" maxlength="60" style="flex:1"></label><label>Type <select id="svT">'+TYPES.map(t=>'<option>'+t+'</option>').join('')+'</select></label><label>Tags <input id="svG" placeholder="comma separated" style="flex:1"></label><div id="svW" class="warn"></div>');
+ const nm=body.querySelector('#svN'),ty=body.querySelector('#svT'),tg=body.querySelector('#svG'),wr=body.querySelector('#svW');
+ nm.value=p0?p0.name:(isDirty()||curPreset().factory?curPreset().name.replace(/ \*$/,'')+' mine':curPreset().name);ty.value=p0?p0.type:curPreset().type;tg.value=p0?p0.tags.join(', '):curPreset().tags.join(', ');
+ const doSave=(name)=>{const tags=tg.value.split(',').map(s=>s.trim()).filter(Boolean).slice(0,8);
+  if(p0){const old=p0.name;p0.name=name;p0.type=ty.value;p0.tags=tags;if(cur.name===old)cur.name=name}
+  else{const o={name,type:ty.value,tags,p:Object.assign({},DEF,pick(st)),factory:false};user=user.filter(x=>x.name!==name);user.push(o);cur.name=name}
+  saveUser();closeModal();syncUI();toast('Saved '+name)};
+ const foot=[btn('Cancel',closeModal),btn(p0?'Save changes':'Save',()=>{const name=nm.value.trim();if(!name){wr.textContent='Give it a name.';return}
+  if(FACTORY.some(f=>f.name===name)){wr.textContent='That is a factory name. Pick another, or it would be confusing.';return}
+  const clash=user.find(x=>x.name===name&&x!==p0);
+  if(clash){wr.innerHTML='A preset named <b>'+esc(name)+'</b> already exists. ';const o=btn('Overwrite',()=>doSave(name)),n=btn('Save as new',()=>{nm.value=name+' 2';wr.textContent=''});wr.appendChild(o);wr.appendChild(document.createTextNode(' '));wr.appendChild(n);return}
+  doSave(name)},'on')];
+ openModal(p0?'Edit preset':'Save preset',body,foot,'520px')}
+function pick(s){const o={};for(const k of PKEYS)o[k]=s[k];return o}
+$('#pSave').onclick=()=>openSave();
+$('#bBypass').onclick=()=>{st.bypass^=1;syncUI()};
+function openExport(p){const data=p?{apurrr2500:1,presets:[{name:p.name,type:p.type,tags:p.tags,p:p.p}]}:{apurrr2500:1,presets:user.map(x=>({name:x.name,type:x.type,tags:x.tags,p:x.p}))};
+ const body=el('div','','<p>Copy this text and keep it as your backup. Import it again later or on another computer.</p><textarea id="exT" readonly></textarea>');body.querySelector('#exT').value=JSON.stringify(data,null,1);
+ const foot=[btn('Copy',()=>{const t=body.querySelector('#exT');t.select();try{navigator.clipboard.writeText(t.value).then(()=>toast('Copied'),()=>toast('Press Ctrl+C to copy'))}catch(e){toast('Press Ctrl+C to copy')}}),btn('Back',openBrowser)];openModal('Export',body,foot,'620px')}
+function openImport(){const body=el('div','','<p>Paste exported preset text here. Unknown settings are ignored and anything invalid is refused.</p><textarea id="imT"></textarea><div id="imW" class="warn"></div>');
+ const foot=[btn('Back',openBrowser),btn('Import',()=>{const w=body.querySelector('#imW');try{const o=JSON.parse(body.querySelector('#imT').value);if(!o||o.apurrr2500!==1||!Array.isArray(o.presets))throw 0;
+  const ok=o.presets.filter(validPreset);if(!ok.length||ok.length!==o.presets.length)throw 0;ok.forEach(x=>{const n=normPreset(x);if(FACTORY.some(f=>f.name===n.name))n.name+=' (imported)';user=user.filter(u=>u.name!==n.name);user.push(n)});saveUser();toast('Imported '+ok.length+' preset'+(ok.length>1?'s':''));openBrowser()}catch(e){w.textContent='That text is not a valid Apurrr2500 preset export.'}},'on')];openModal('Import',body,foot,'620px')}
+/* ============ Tooltips ============ */
+let tipT=null,tipEl=$('#tip');
+stage.addEventListener('pointerover',e=>{const t=e.target.closest('[data-tip]');clearTimeout(tipT);tipEl.hidden=true;if(!t||!settings.tips||!t.dataset.tip)return;
+ tipT=setTimeout(()=>{const r=t.getBoundingClientRect(),sr=stage.getBoundingClientRect(),sc=curScale();tipEl.textContent=t.dataset.tip;tipEl.hidden=false;
+  let x=(r.left-sr.left)/sc,y=(r.bottom-sr.top)/sc+6;const tw=tipEl.offsetWidth;x=Math.max(60,Math.min(W0-tw-60,x));if(y+tipEl.offsetHeight>H0-4)y=(r.top-sr.top)/sc-tipEl.offsetHeight-6;tipEl.style.left=x+'px';tipEl.style.top=y+'px'},1000)});
+stage.addEventListener('pointerout',e=>{if(!e.relatedTarget||!e.relatedTarget.closest||!e.relatedTarget.closest('[data-tip]')){clearTimeout(tipT);tipEl.hidden=true}});
+stage.addEventListener('pointerdown',()=>{clearTimeout(tipT);tipEl.hidden=true});
+/* ============ Scaling and resize handles ============ */
+const W0=1360,H0=660;let s0=1,sc=1;
+function avail(){return Math.max(160,(app.clientWidth||window.innerWidth-32))}
+function curScale(){return sc}
+function setScale(s){const mx=Math.min(1.5*s0,avail()/W0*1.0);sc=Math.max(0.4*s0,Math.min(Math.max(mx,s0),s));
+ frame.style.width=W0*sc+'px';frame.style.height=H0*sc+'px';stage.style.transform='scale('+sc+')';$('#zPct').textContent=Math.round(sc/s0*100)+'%';$('#winsz').textContent=Math.round(W0*sc)+' × '+Math.round(H0*sc)+' px'}
+function fit(){s0=Math.min(1,avail()/W0);return s0}
+window.addEventListener('resize',()=>{const r=sc/s0;fit();setScale(s0*r)});
+fit();setScale(s0);
+$$('.rh').forEach(h=>{let d=null;h.addEventListener('pointerdown',e=>{h.setPointerCapture(e.pointerId);d={x:e.clientX,y:e.clientY,s:sc};e.preventDefault()});
+ h.addEventListener('pointermove',e=>{if(!d)return;const k=h.dataset.h,dx=e.clientX-d.x,dy=e.clientY-d.y;
+  const ex=k.includes('e')?dx*2:k.includes('w')?-dx*2:0,ey=k.includes('s')?dy*2:k.includes('n')?-dy*2:0;
+  const rx=ex/(W0*d.s),ry=ey/(H0*d.s);setScale(d.s*(1+(Math.abs(rx)>Math.abs(ry)?rx:ry)))});
+ h.addEventListener('pointerup',()=>d=null);h.addEventListener('pointercancel',()=>d=null)});
+$('#zMinus').onclick=()=>setScale(sc*.9);$('#zPlus').onclick=()=>setScale(sc*1.1);$('#zPct').onclick=()=>setScale(s0);
+$$('.cheek').forEach(c=>c.addEventListener('dblclick',()=>{setScale(s0);toast('Window reset to 100%')}));
+/* ============ Keyboard ============ */
+document.addEventListener('keydown',e=>{if(!modal.hidden){if(e.key==='Escape')closeModal();return}const t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT'||t.tagName==='TEXTAREA'))return;
+ const k=e.key.toLowerCase();
+ if(e.key===' '&&t.tagName!=='BUTTON'){e.preventDefault();playing?stopAudio():startAudio()}
+ else if(k==='b'){st.bypass^=1;syncUI()}
+ else if(k==='i'){st.inSw^=1;syncUI()}
+ else if(k==='k'){st.knee=(st.knee+1)%3;syncUI()}
+ else if(k==='t'){st.tilt=(st.tilt+1)%3;syncUI()}
+ else if(k==='y'){st.type^=1;syncUI()}
+ else if(k==='m'){st.meter=(st.meter+1)%3;syncUI()}
+ else if(k==='r'){st.ratio=(st.ratio+(e.shiftKey?6:1))%7;syncUI()}});
+syncUI();requestAnimationFrame(frameLoop);
+window.__apurr={st,eng,syncUI,openBrowser,setScale,loadPreset,FACTORY,core,get sc(){return sc},get s0(){return s0}};
+})();
+</script>
