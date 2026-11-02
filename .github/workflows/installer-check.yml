@@ -1,0 +1,23 @@
+# Fast check (about 2 minutes) that the Windows installer script compiles, so script mistakes show up before the long release build.
+name: installer-check
+on:
+  push:
+    paths: ['packaging/**', 'assets/icons/**', '.github/workflows/installer-check.yml']
+  workflow_dispatch:
+jobs:
+  iss:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile the Inno Setup script with dummy files
+        run: |
+          mkdir -p stage/vst3/Apurrr2500.vst3/Contents/x86_64-win
+          echo dummy > stage/vst3/Apurrr2500.vst3/Contents/x86_64-win/Apurrr2500.vst3
+          echo dummy > stage/Apurrr2500-manual.pdf
+          iscc="/c/Program Files (x86)/Inno Setup 6/ISCC.exe"
+          [ -f "$iscc" ] || { choco install innosetup -y --no-progress; }
+          "$iscc" "//DName=Apurrr2500" "//DProduct=Apurrr2500" "//DVersion=0.0.1" packaging/windows.iss
+          ls -l Output

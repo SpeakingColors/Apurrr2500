@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Apurrr2500 manual</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{--bg:#0b0b0d;--card:#16171a;--line:#33363d;--ink:#e8e9ee;--dim:#a9adb8;--teal:#02EBBA;--pink:#FF7BB1}
+@media print{:root{--bg:#fff;--card:#f4f4f6;--line:#c9cbd3;--ink:#16171a;--dim:#4a4d55;--teal:#007a62;--pink:#b0114f}@page{margin:14mm}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Barlow Condensed","Arial Narrow",Arial,sans-serif;padding:24px 16px}
+main{max-width:980px;margin:0 auto}
+h1{font-size:40px;margin:0 0 4px;font-style:italic}
+h2{font-size:26px;margin:32px 0 8px;color:var(--teal);letter-spacing:1px;text-transform:uppercase;break-after:avoid}
+a{color:var(--pink)} img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:6px;display:block;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+td,th{border-bottom:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top} th{white-space:nowrap}
+code,kbd{font-family:Consolas,monospace;font-size:13px;background:var(--card);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.b{display:inline-block;min-width:20px;text-align:center;border-radius:10px;background:#FF7BB1;color:#0b0b0d;font-weight:700;padding:0 5px}.g{background:#02EBBA}
+.note{background:var(--card);border-left:3px solid var(--teal);padding:8px 12px;margin:12px 0}.dim{color:var(--dim)}
+tr{break-inside:avoid} img{break-inside:avoid} section{break-inside:auto}
+.pg{break-before:page}
+</style></head><body><main>
+<h1>Apurrr2500</h1>
+<p class="dim">Manual for version @VER@. Studio 87. Free and open source (AGPL-3.0-or-later). Collects nothing, never uses the network.</p>
+<p>A stereo bus compressor in the style of a classic hardware bus compressor. Our own code, written from public descriptions; no code, names or artwork from any hardware maker.</p>
+<img src="manual/tour.png" alt="The Apurrr2500 window with numbered controls and lettered displays">
+
+<h2>Quick start</h2>
+<ol><li>Put Apurrr2500 on a bus. The first preset, <b>Start Here</b>, is 2:1, attack 10 ms, release 200 ms.</li>
+<li>Lower <b>Threshold</b> (turn it right) until the GR meter shows 2 to 4 dB on the loud parts.</li>
+<li>Compare with <b>IN</b> (I) and use <b>Level Match</b> so a louder sound does not fool you.</li>
+<li>For parallel compression use Blend <b>Par</b> and Mix around 40 to 60. For a kick duck, route the kick to the side-chain input, set Type to New and turn Ext SC on.</li></ol>
+<p><b>Signal flow in one line:</b> input, (Tilt filter and Type decide what the detector hears), gain reduction, Make-up, Blend with the untouched sound, Bypass crossfade, output.</p>
+
+<h2 class="pg">Interface tour</h2>
+<p class="dim">Pink numbers are controls, mint letters are displays. The picture is the compiled plugin window.</p>
+<h3>Header</h3><img src="manual/header.png" alt="Header">
+<h3>Displays</h3><img src="manual/displays.png" alt="Displays">
+<table>@DROWS@</table>
+<h3>Level</h3><img src="manual/level.png" alt="Level column" style="max-width:420px">
+<h3>Detector</h3><img src="manual/detector.png" alt="Detector column" style="max-width:380px">
+<h3>Time</h3><img src="manual/time.png" alt="Time column" style="max-width:420px">
+<h3>Meter and meters</h3><img src="manual/meter.png" alt="Meter column" style="max-width:340px"><img src="manual/meters.png" alt="Level meters" style="max-width:170px">
+<h3>Every control</h3>
+<table><tr><th>#</th><th>Control</th><th>What it does</th><th>Range</th><th>Default</th></tr>
+@ROWS@
+</table>
+<p class="dim">Meters: the In and Out strips read peak level, -60 to +6 dB (blue to -12, purple to 0, pink above; click to clear the clip marker). Numbers under the strips are the peak read-outs in dB.</p>
+
+<h2 class="pg">Presets</h2>
+<p>16 factory presets are built in. Your own presets are plain text files:</p>
+<ul><li>Linux: <code>~/.local/share/Studio 87/Apurrr2500/presets</code></li><li>Windows: <code>%APPDATA%\Studio 87\Apurrr2500\presets</code></li><li>macOS: <code>~/Library/Application Support/Studio 87/Apurrr2500/presets</code></li></ul>
+<p>Export and Import in the browser use plain text you can paste anywhere; anything invalid is refused. A preset does not change Bypass, Level Match or the meter choice. The window size, look, bubbles and needle settings are saved with the project, not with presets.</p>
+<table>@FAC@</table>
+<h2>Keyboard and mouse</h2>
+<table><tr><td><kbd>B</kbd></td><td>Bypass</td></tr><tr><td><kbd>I</kbd></td><td>IN on or off</td></tr><tr><td><kbd>K</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>M</kbd></td><td>Next knee, tilt, type (Old or New), meter</td></tr><tr><td><kbd>R</kbd> / <kbd>Shift+R</kbd></td><td>Next or previous ratio</td></tr><tr><td>Knobs</td><td>Drag, wheel, arrows; Shift for fine steps on smooth knobs; double-click resets</td></tr><tr><td>Window</td><td>Drag any edge or corner (proportions stay). Double-click the wood to return to 100 %.</td></tr></table>
+<p class="dim">Hover any control for about a second for an info bubble (Settings can turn bubbles off). Keys work while the plugin window has focus; some hosts keep the focus.</p>
+
+<h2>Install and uninstall</h2>
+<ul><li><b>Windows:</b> run the installer; it puts the VST3 in the common VST3 folder. Remove it from Settings, Apps. It asks before touching your presets.</li>
+<li><b>macOS:</b> open the .pkg; use "Uninstall Apurrr2500" in Applications to remove it.</li>
+<li><b>Linux:</b> Flatpak DAWs: <code>flatpak install --user</code> the .flatpak file. Native DAWs: unpack the tarball into <code>~/.vst3</code>.</li></ul>
+<div class="note"><b>About the "unknown publisher" warnings.</b> The installers are not signed, because signing needs a paid certificate and this is a free project. Windows may show "Windows protected your PC": click More info, then Run anyway. macOS may block the package: open System Settings, Privacy and Security, and choose Open Anyway. The zip contains SHA256SUMS and the source is public.</div>
+
+<h2 class="pg">Under the hood</h2>
+<p><b>Measured in plain C++ tests (the same core code the plugin runs):</b></p>
+<ul>
+<li>Static curve: measured gain reduction on a -10 dBFS RMS sine matches the curve within 0.1 dB (2:1 gives 6.05 dB, 4:1 gives 9.08 dB).</li>
+<li>Latency: 0 samples. No look-ahead and no oversampling. Parameter changes act within one sample; smoothing is 10 ms on threshold, ratio, knee and mix, 8 ms on IN.</li>
+<li>Timing: with a 1 ms attack the reduction reaches 63 percent after 3.3 ms; a 200 ms release falls to 37 percent after 202 ms.</li>
+<li>Stability: all 126 combinations of the switches survive silence, DC, full scale, NaN and Inf and return to silence.</li>
+<li>Distortion plus aliasing, Inf ratio, fastest attack, 0.9 amplitude sine: -87 dB at 1 kHz, -120 dB at 9 and 15 kHz. At 100 Hz it is -48 dB: with the fastest attack the gain follows the waveform, which is the compressor acting as a distorter, not aliasing.</li>
+<li>CPU: 10 seconds of stereo took 1.8 percent of one core on the test machine. Sample rates 44.1 to 192 kHz all work.</li>
+<li>Level Match brings the output within 0.01 dB of the input level after 10 s in the test. Bypass and IN off are bit exact.</li>
+<li>The core produces the same gain reduction as the approved mockup's own engine on four test scenarios (difference 0.000 dB).</li></ul>
+<p><b>Old and New.</b> Old listens after the gain stage (a feedback design), New before it. The mockup's description says Old lets a sudden hit through for a moment. In our measurement with a 0.3 ms attack, 0.7 ms into a burst New has reduced 2.2 dB while Old has reduced 6.8 dB, and both settle to 9.08 dB. So Old reacts faster at the very start here, and the info bubble text is a design decision still to be reviewed (see ROADMAP).</p>
+<p><b>Not verified:</b> the level calibration (0 dBu = -22 dBFS, needle 0 VU = -18 dBFS) comes from the design and has not been compared with a real hardware unit. The installers and the plugin have not been tried on real Windows or macOS machines or in every DAW. Compression feel and sound have not been judged by ear against any other compressor.</p>
+<h2>Licence and thanks</h2>
+<p>AGPL-3.0-or-later. Built with JUCE (AGPLv3). Fonts: Barlow Condensed and JetBrains Mono, SIL Open Font Licence 1.1. Source: <a href="https://github.com/SpeakingColors/apurrr2500">github.com/SpeakingColors/apurrr2500</a>. Optional support: <a href="https://ko-fi.com/studio87">ko-fi.com/studio87</a>.</p>
+</main></body></html>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<APURRR2500 look="B" needle="50" ref="16" preset="Mix Bus Glue" stateVersion="1">
+  <PARAM id="attack" value="2.0"/>
+  <PARAM id="blend" value="2.0"/>
+  <PARAM id="bypass" value="0.0"/>
+  <PARAM id="extSc" value="0.0"/>
+  <PARAM id="gain" value="7.5"/>
+  <PARAM id="inSw" value="1.0"/>
+  <PARAM id="knee" value="2.0"/>
+  <PARAM id="levelMatch" value="1.0"/>
+  <PARAM id="link" value="3.0"/>
+  <PARAM id="meter" value="2.0"/>
+  <PARAM id="mix" value="35.0"/>
+  <PARAM id="muMode" value="1.0"/>
+  <PARAM id="ratio" value="6.0"/>
+  <PARAM id="relVar" value="420.0000305175781"/>
+  <PARAM id="release" value="6.0"/>
+  <PARAM id="shape" value="2.0"/>
+  <PARAM id="thr" value="-6.5"/>
+  <PARAM id="tilt" value="2.0"/>
+  <PARAM id="type" value="0.0"/>
+</APURRR2500>

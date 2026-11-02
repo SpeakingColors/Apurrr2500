@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Apurrr2500 manual</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{--bg:#0b0b0d;--card:#16171a;--line:#33363d;--ink:#e8e9ee;--dim:#a9adb8;--teal:#02EBBA;--pink:#FF7BB1}
+@media print{:root{--bg:#fff;--card:#f4f4f6;--line:#c9cbd3;--ink:#16171a;--dim:#4a4d55;--teal:#007a62;--pink:#b0114f}@page{margin:14mm}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Barlow Condensed","Arial Narrow",Arial,sans-serif;padding:24px 16px}
+main{max-width:980px;margin:0 auto}
+h1{font-size:40px;margin:0 0 4px;font-style:italic}
+h2{font-size:26px;margin:32px 0 8px;color:var(--teal);letter-spacing:1px;text-transform:uppercase;break-after:avoid}
+a{color:var(--pink)} img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:6px;display:block;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+td,th{border-bottom:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top} th{white-space:nowrap}
+code,kbd{font-family:Consolas,monospace;font-size:13px;background:var(--card);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.b{display:inline-block;min-width:20px;text-align:center;border-radius:10px;background:#FF7BB1;color:#0b0b0d;font-weight:700;padding:0 5px}.g{background:#02EBBA}
+.note{background:var(--card);border-left:3px solid var(--teal);padding:8px 12px;margin:12px 0}.dim{color:var(--dim)}
+tr{break-inside:avoid} img{break-inside:avoid} section{break-inside:auto}
+.pg{break-before:page}
+</style></head><body><main>
+<h1>Apurrr2500</h1>
+<p class="dim">Manual for version 0.1.0. Studio 87. Free and open source (AGPL-3.0-or-later). Collects nothing, never uses the network.</p>
+<p>A stereo bus compressor in the style of a classic hardware bus compressor. Our own code, written from public descriptions; no code, names or artwork from any hardware maker.</p>
+<img src="manual/tour.png" alt="The Apurrr2500 window with numbered controls and lettered displays">
+
+<h2>Quick start</h2>
+<ol><li>Put Apurrr2500 on a bus. The first preset, <b>Start Here</b>, is 2:1, attack 10 ms, release 200 ms.</li>
+<li>Lower <b>Threshold</b> (turn it right) until the GR meter shows 2 to 4 dB on the loud parts.</li>
+<li>Compare with <b>IN</b> (I) and use <b>Level Match</b> so a louder sound does not fool you.</li>
+<li>For parallel compression use Blend <b>Par</b> and Mix around 40 to 60. For a kick duck, route the kick to the side-chain input, set Type to New and turn Ext SC on.</li></ol>
+<p><b>Signal flow in one line:</b> input, (Tilt filter and Type decide what the detector hears), gain reduction, Make-up, Blend with the untouched sound, Bypass crossfade, output.</p>
+
+<h2 class="pg">Interface tour</h2>
+<p class="dim">Pink numbers are controls, mint letters are displays. The picture is the compiled plugin window.</p>
+<h3>Header</h3><img src="manual/header.png" alt="Header">
+<h3>Displays</h3><img src="manual/displays.png" alt="Displays">
+<table><tr><td><span class="b g">A</span></td><th>Transfer curve</th><td colspan="3">Input level across (-60 to 0 dB), output level up (-60 to +12 dB). White dashed line is 1:1, the mint line is your compression curve, the purple band is the knee, the pink dashed line is the threshold. The white dot is the live signal.</td></tr>
+<tr><td><span class="b g">B</span></td><th>Detector filter</th><td colspan="3">How the detector hears each frequency, 20 Hz to 20 kHz, -20 to +20 dB. Flat for Norm; lows count less and highs more for Med and Loud.</td></tr>
+<tr><td><span class="b g">C</span></td><th>Gain reduction history</th><td colspan="3">The last six seconds of gain reduction, 0 to 20 dB, hanging from the top. Mint filled is left, pink dashed is right.</td></tr>
+<tr><td><span class="b g">D</span></td><th>Needle meter</th><td colspan="3">Two needles, mint left and pink right. GR mode reads 0 to 20 dB with 0 at the right. Out and In modes read VU, -20 to +3, with 0 VU at -18 dBFS by default (Settings can change it).</td></tr>
+<tr><td><span class="b g">E</span></td><th>Old vs New</th><td colspan="3">A built-in test: 1 kHz at -34 dB, a loud burst from 100 to 300 ms, then quiet again, run through your settings by the real compressor code. Mint is New, yellow is Old. It shows the gain reduction over half a second, in dB.</td></tr></table>
+<h3>Level</h3><img src="manual/level.png" alt="Level column" style="max-width:420px">
+<h3>Detector</h3><img src="manual/detector.png" alt="Detector column" style="max-width:380px">
+<h3>Time</h3><img src="manual/time.png" alt="Time column" style="max-width:420px">
+<h3>Meter and meters</h3><img src="manual/meter.png" alt="Meter column" style="max-width:340px"><img src="manual/meters.png" alt="Level meters" style="max-width:170px">
+<h3>Every control</h3>
+<table><tr><th>#</th><th>Control</th><th>What it does</th><th>Range</th><th>Default</th></tr>
+<tr><td><span class="b">1</span></td><th>Preset bar</th><td>Arrows step through presets. The name opens the preset browser (search, type chips, load, export, rename, delete). Double-click the name to rename your own preset. Save stores the settings as your own preset and asks before overwriting.</td><td>arrows, name, Save</td><td>Start Here</td></tr>
+<tr><td><span class="b">2</span></td><th>Bypass</th><td>Bypass: hear the dry signal to compare with the compressed sound (B). The meters keep moving.</td><td>on / off</td><td>off</td></tr>
+<tr><td><span class="b">3</span></td><th>Guide</th><td>Short guide and keyboard shortcuts.</td><td></td><td></td></tr>
+<tr><td><span class="b">4</span></td><th>Settings</th><td>Info bubbles, power saving, colour look, needle meter.</td><td></td><td></td></tr>
+<tr><td><span class="b">5</span></td><th>About &amp; Support</th><td>About Apurrr2500, support and where your files live.</td><td></td><td></td></tr>
+<tr><td><span class="b">6</span></td><th>Threshold</th><td>Threshold: the level where the compressor starts turning the sound down. Try: lower it (turn right) until the gain reduction meter shows 2 to 4 dB on the loud parts. Range +10 to -20 dBu; 0 dBu is -22 dBFS here. The lamp beside the knob lights while the sound is over the threshold.</td><td>+10 to -20 dBu (0 dBu = -22 dBFS)</td><td>+4 dBu</td></tr>
+<tr><td><span class="b">7</span></td><th>Ratio</th><td>Ratio: how hard the sound over the threshold is pushed down. Try: 1.5 or 2 for glue on a whole mix, 4 for drums, 10 or Inf to catch peaks like a limiter. The row of small buttons under the knobs jumps straight to a step.</td><td>1.5, 2, 3, 4, 6, 10, Inf : 1</td><td>2:1</td></tr>
+<tr><td><span class="b">8</span></td><th>Make-up</th><td>Make-up: brings the level back up after compression, 0 to +24 dB, on Manual. On Auto it follows Threshold and Ratio. Try: use Level Match to compare fairly, because louder always sounds better.</td><td>0 to +24 dB (Manual)</td><td>Auto</td></tr>
+<tr><td><span class="b">9</span></td><th>Knee</th><td>Soft: Soft knee: compression fades in gradually, so it is hard to hear. Try: Soft for glue on a full mix. Med: Medium knee: compression fades in a little. Try: Med as a safe middle for most buses. Hard: Hard knee: compression starts sharply at the threshold, so it is punchier and easier to hear. Try: Hard for drums and peak catching.</td><td>Soft 12 dB, Med 6 dB, Hard 0.5 dB</td><td>Med</td></tr>
+<tr><td><span class="b">10</span></td><th>Make-up</th><td>Auto: Auto make-up: the level comes back up by itself, based on Threshold and Ratio. Try: leave on Auto while you find the settings. Manual: Manual make-up: you set the gain with the Make-up knob. Try: switch here when you want exact control. In Old type the detector hears the make-up too.</td><td>Auto, Manual</td><td>Auto</td></tr>
+<tr><td><span class="b">11</span></td><th>Tilt filter</th><td>Norm: Norm: the detector hears all frequencies equally, like a normal compressor. Try: start here. Med: Med: the detector hears less bass and more treble, and the mids stay flat from 200 Hz to 3 kHz. Try: Med on a drum bus so the kick pumps the mix less. Loud: Loud: a steady tilt, 15 dB less at 20 Hz and 15 dB more at 20 kHz (3 dB per octave). It only changes what the compressor listens to, not your sound. Try: Loud on a full mix to stop the bass from pumping everything.</td><td>Norm, Med, Loud</td><td>Norm</td></tr>
+<tr><td><span class="b">12</span></td><th>Type</th><td>Old: Old: the detector listens to the sound after compression. Smoother and gentler, but a sudden loud hit gets through for a moment. Try: Old for glue and warmth. See the Old vs New display. New: New: the detector listens to the sound before compression. It reacts faster, harder and more exactly. Try: New for drums and tight control. Needed for Ext SC.</td><td>Old, New</td><td>New</td></tr>
+<tr><td><span class="b">13</span></td><th>Ext SC</th><td>Ext SC: the detector listens to another track, such as a kick, instead of this sound. It only works in Type New. Try: duck a bass or pad from the kick. This preview uses a built-in kick.</td><td>on / off</td><td>off</td></tr>
+<tr><td><span class="b">14</span></td><th>Link</th><td>Link: how much the left and right channels share their gain reduction. IND keeps them apart; 100% turns both down together so the stereo image stays steady. Try: 100% for a mix, 50 to 70% for wide material. The row of small buttons under it jumps to a step.</td><td>IND, 50 to 100 %</td><td>100 %</td></tr>
+<tr><td><span class="b">15</span></td><th>Link shape</th><td>Fast: Fast: the other channel&#x27;s reduction arrives at once, so peaks link quickly. Try: Fast for a tight stereo image. Slow: Slow: the other channel&#x27;s reduction arrives gradually, so only longer swells link. Try: Slow for a livelier, wider sound. Both: Both: the linking is even slower and very subtle. Try: Both with a Link of 50 to 70% for gentle width.</td><td>Fast, Slow, Both</td><td>Fast</td></tr>
+<tr><td><span class="b">16</span></td><th>Attack</th><td>Attack: how fast the compressor grabs the sound, 0.03 ms (instant) to 30 ms (slow). Try: 10 or 30 ms keeps the punch of drums; 1 ms or less to tame sharp peaks.</td><td>0.03 to 30 ms, 7 steps</td><td>10 ms</td></tr>
+<tr><td><span class="b">17</span></td><th>Release</th><td>Release: how long the compressor takes to let go, 50 ms to 2 s. The last step, Var, uses the Var knob. Try: 100 to 200 ms so it breathes with the beat; longer for a smooth, slow glue.</td><td>50 ms to 2 s, or Var</td><td>200 ms</td></tr>
+<tr><td><span class="b">18</span></td><th>Var</th><td>Var: a smooth release time from 50 ms to 3 s. It only works when Release is on the Var step. Try: set it to match the tempo, about 150 ms at 140 BPM.</td><td>50 ms to 3 s (log)</td><td>150 ms</td></tr>
+<tr><td><span class="b">19</span></td><th>Blend</th><td>100%: 100%: all of the sound is compressed and Mix is not used. Try: start here. X-fade: X-fade: Mix fades from the untouched sound (0) to the compressed sound (100). Try: 50 to hear both together without getting louder. Par: Par: the compressed sound is added on top of the untouched sound (louder). It keeps the punch and adds weight. Try: a hard squash (Ratio 6 or more, Soft knee) with Mix near 50 to 60.</td><td>100 %, X-fade, Par</td><td>100 %</td></tr>
+<tr><td><span class="b">20</span></td><th>Mix</th><td>Mix: how much compressed sound is blended in. Its meaning depends on Blend, and it does nothing when Blend is 100%. Try: Par with Mix around 40 to 60 for parallel compression.</td><td>0 to 100 %</td><td>100 %</td></tr>
+<tr><td><span class="b">21</span></td><th>Meter shows</th><td>GR: GR: shows how many dB the compressor is turning the sound down, 0 at the right. Try: aim for 2 to 4 dB of movement on a mix bus. Out: Out: shows the output level in dB (0 VU is -18 dBFS). Try: watch it when matching the level with and without compression. In: In: shows the input level in dB (0 VU is -18 dBFS). Try: check that the sound is not too quiet for the Threshold to catch.</td><td>GR, Out, In</td><td>GR</td></tr>
+<tr><td><span class="b">22</span></td><th>IN</th><td>IN: turns the compression on or off with no click, while the sound keeps passing. Try: flick it while listening to hear what the compressor adds. (Bypass in the header switches off the whole plugin.)</td><td>on / off</td><td>on</td></tr>
+<tr><td><span class="b">23</span></td><th>Level Match</th><td>Level Match: slowly changes the output so the compressed sound is as loud as the untouched sound, for a fair comparison. Try: turn it on while you compare with IN, then off.</td><td>on / off</td><td>off</td></tr>
+<tr><td><span class="b">24</span></td><th>In meter</th><td>Input level meter in dB. Blue is safe, purple is the warning zone, pink is clipping. Click to clear the clip light.</td><td>-60 to +6 dB</td><td></td></tr>
+<tr><td><span class="b">25</span></td><th>GR meter</th><td>Gain reduction meter in dB, left and right. It hangs from the top: the longer the bar, the more the signal is turned down.</td><td>0 to 20 dB</td><td></td></tr>
+<tr><td><span class="b">26</span></td><th>Out meter</th><td>Output level meter in dB. Blue is safe, purple is the warning zone, pink is clipping. Click to clear the clip light.</td><td>-60 to +6 dB</td><td></td></tr>
+</table>
+<p class="dim">Meters: the In and Out strips read peak level, -60 to +6 dB (blue to -12, purple to 0, pink above; click to clear the clip marker). Numbers under the strips are the peak read-outs in dB.</p>
+
+<h2 class="pg">Presets</h2>
+<p>16 factory presets are built in. Your own presets are plain text files:</p>
+<ul><li>Linux: <code>~/.local/share/Studio 87/Apurrr2500/presets</code></li><li>Windows: <code>%APPDATA%\Studio 87\Apurrr2500\presets</code></li><li>macOS: <code>~/Library/Application Support/Studio 87/Apurrr2500/presets</code></li></ul>
+<p>Export and Import in the browser use plain text you can paste anywhere; anything invalid is refused. A preset does not change Bypass, Level Match or the meter choice. The window size, look, bubbles and needle settings are saved with the project, not with presets.</p>
+<table><tr><th>Start Here</th><td>Mix</td></tr><tr><th>Drum Bus Glue</th><td>Drum</td></tr><tr><th>Drum Smash Parallel</th><td>Drum</td></tr><tr><th>Mix Bus Glue</th><td>Mix</td></tr><tr><th>Hard Dance Master Glue</th><td>Master</td></tr><tr><th>Kick Duck Ext SC</th><td>Synth</td></tr><tr><th>Bass Bus Tight</th><td>Bass</td></tr><tr><th>Vocal Bus Smooth</th><td>Vocal</td></tr><tr><th>Synth Bus Control</th><td>Synth</td></tr><tr><th>Snare Snap</th><td>Drum</td></tr><tr><th>Slow Squeeze</th><td>Mix</td></tr><tr><th>Peak Catch</th><td>Master</td></tr><tr><th>Old Feedback Warmth</th><td>Mix</td></tr><tr><th>Bright Lift</th><td>FX</td></tr><tr><th>Loose Link Glue</th><td>Mix</td></tr><tr><th>Gentle Parallel Lift</th><td>Mix</td></tr></table>
+<h2>Keyboard and mouse</h2>
+<table><tr><td><kbd>B</kbd></td><td>Bypass</td></tr><tr><td><kbd>I</kbd></td><td>IN on or off</td></tr><tr><td><kbd>K</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>M</kbd></td><td>Next knee, tilt, type (Old or New), meter</td></tr><tr><td><kbd>R</kbd> / <kbd>Shift+R</kbd></td><td>Next or previous ratio</td></tr><tr><td>Knobs</td><td>Drag, wheel, arrows; Shift for fine steps on smooth knobs; double-click resets</td></tr><tr><td>Window</td><td>Drag any edge or corner (proportions stay). Double-click the wood to return to 100 %.</td></tr></table>
+<p class="dim">Hover any control for about a second for an info bubble (Settings can turn bubbles off). Keys work while the plugin window has focus; some hosts keep the focus.</p>
+
+<h2>Install and uninstall</h2>
+<ul><li><b>Windows:</b> run the installer; it puts the VST3 in the common VST3 folder. Remove it from Settings, Apps. It asks before touching your presets.</li>
+<li><b>macOS:</b> open the .pkg; use "Uninstall Apurrr2500" in Applications to remove it.</li>
+<li><b>Linux:</b> Flatpak DAWs: <code>flatpak install --user</code> the .flatpak file. Native DAWs: unpack the tarball into <code>~/.vst3</code>.</li></ul>
+<div class="note"><b>About the "unknown publisher" warnings.</b> The installers are not signed, because signing needs a paid certificate and this is a free project. Windows may show "Windows protected your PC": click More info, then Run anyway. macOS may block the package: open System Settings, Privacy and Security, and choose Open Anyway. The zip contains SHA256SUMS and the source is public.</div>
+
+<h2 class="pg">Under the hood</h2>
+<p><b>Measured in plain C++ tests (the same core code the plugin runs):</b></p>
+<ul>
+<li>Static curve: measured gain reduction on a -10 dBFS RMS sine matches the curve within 0.1 dB (2:1 gives 6.05 dB, 4:1 gives 9.08 dB).</li>
+<li>Latency: 0 samples. No look-ahead and no oversampling. Parameter changes act within one sample; smoothing is 10 ms on threshold, ratio, knee and mix, 8 ms on IN.</li>
+<li>Timing: with a 1 ms attack the reduction reaches 63 percent after 3.3 ms; a 200 ms release falls to 37 percent after 202 ms.</li>
+<li>Stability: all 126 combinations of the switches survive silence, DC, full scale, NaN and Inf and return to silence.</li>
+<li>Distortion plus aliasing, Inf ratio, fastest attack, 0.9 amplitude sine: -87 dB at 1 kHz, -120 dB at 9 and 15 kHz. At 100 Hz it is -48 dB: with the fastest attack the gain follows the waveform, which is the compressor acting as a distorter, not aliasing.</li>
+<li>CPU: 10 seconds of stereo took 1.8 percent of one core on the test machine. Sample rates 44.1 to 192 kHz all work.</li>
+<li>Level Match brings the output within 0.01 dB of the input level after 10 s in the test. Bypass and IN off are bit exact.</li>
+<li>The core produces the same gain reduction as the approved mockup's own engine on four test scenarios (difference 0.000 dB).</li></ul>
+<p><b>Old and New.</b> Old listens after the gain stage (a feedback design), New before it. The mockup's description says Old lets a sudden hit through for a moment. In our measurement with a 0.3 ms attack, 0.7 ms into a burst New has reduced 2.2 dB while Old has reduced 6.8 dB, and both settle to 9.08 dB. So Old reacts faster at the very start here, and the info bubble text is a design decision still to be reviewed (see ROADMAP).</p>
+<p><b>Not verified:</b> the level calibration (0 dBu = -22 dBFS, needle 0 VU = -18 dBFS) comes from the design and has not been compared with a real hardware unit. The installers and the plugin have not been tried on real Windows or macOS machines or in every DAW. Compression feel and sound have not been judged by ear against any other compressor.</p>
+<h2>Licence and thanks</h2>
+<p>AGPL-3.0-or-later. Built with JUCE (AGPLv3). Fonts: Barlow Condensed and JetBrains Mono, SIL Open Font Licence 1.1. Source: <a href="https://github.com/SpeakingColors/apurrr2500">github.com/SpeakingColors/apurrr2500</a>. Optional support: <a href="https://ko-fi.com/studio87">ko-fi.com/studio87</a>.</p>
+</main></body></html>
