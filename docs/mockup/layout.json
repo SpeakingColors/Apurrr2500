@@ -1485,7 +1485,7 @@
       38
      ],
      "t": "Old",
-     "tip": "Old: the detector listens to the sound after compression. Smoother and gentler, but a sudden loud hit gets through for a moment. Try: Old for glue and warmth. See the Old vs New display.",
+     "tip": "Old: the detector listens to the sound after compression. In our measurement it grips the first instant of a sudden hit a little harder, then eases off gently. Try: Old for glue and warmth. See the Old vs New display.",
      "lc": 0,
      "tr": [
       544.42,
@@ -1510,7 +1510,7 @@
       38
      ],
      "t": "New",
-     "tip": "New: the detector listens to the sound before compression. It reacts faster, harder and more exactly. Try: New for drums and tight control. Needed for Ext SC.",
+     "tip": "New: the detector listens to the sound before compression, so it always judges the untouched sound. Steady and exact. Try: New for drums and tight control. Needed for Ext SC.",
      "lc": 1,
      "tr": [
       592.53,
