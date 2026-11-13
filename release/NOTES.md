@@ -13,3 +13,5 @@ What is verified: the compressor core is tested in plain C++ (ranges, level cali
 What is not verified: the installers have not been run on real Windows or macOS machines yet, the plugin has not been tried in real hosts on every system, and the calibration (0 dBu = -22 dBFS, 0 VU = -18 dBFS) comes from the design mockup and has not been checked against a real hardware unit. See ROADMAP.md.
 
 Free to use. Collects nothing. Optional support: https://ko-fi.com/studio87
+
+New in 0.1.2: the VST3 carries its own icon on macOS and Windows.

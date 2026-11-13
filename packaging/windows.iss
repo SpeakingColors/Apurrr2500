@@ -29,8 +29,14 @@ SelectDirBrowseLabel=To continue, click Next. If you would like to select a diff
 
 [Files]
 Source: "..\stage\vst3\{#Product}.vst3\*"; DestDir: "{commoncf64}\VST3\{#Product}.vst3"; Flags: recursesubdirs createallsubdirs ignoreversion
+Source: "..\assets\icons\icon.ico"; DestDir: "{commoncf64}\VST3\{#Product}.vst3"; Flags: ignoreversion
+Source: "desktop.ini"; DestDir: "{commoncf64}\VST3\{#Product}.vst3"; Attribs: hidden system; Flags: ignoreversion
 Source: "..\stage\{#Name}-manual.pdf"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\assets\icons\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+
+[Dirs]
+; read only on the plugin folder makes Explorer show its icon (desktop.ini)
+Name: "{commoncf64}\VST3\{#Product}.vst3"; Attribs: readonly
 
 [Icons]
 Name: "{group}\{#Product} manual"; Filename: "{app}\{#Name}-manual.pdf"; IconFilename: "{app}\icon.ico"

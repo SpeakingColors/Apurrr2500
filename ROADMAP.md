@@ -15,10 +15,12 @@
 - Installers on real Windows and macOS machines; Flatpak extension in a real Flatpak DAW; plugin in real hosts
 - Resizing, HiDPI and keyboard focus in real hosts
 
+## Done in v0.1.2
+- The VST3 now carries its icon: macOS bundle Resources/icon.icns plus CFBundleIconFile, Windows icon.ico and desktop.ini inside the plugin folder (installer marks the folder read only so Explorer shows it). Built in CI only; not seen on real machines yet.
+
 ## Old vs New text (settled)
 The mockup text used to say Type Old lets a sudden hit through for a moment. The engine measures the opposite at fast attacks (0.3 ms attack, 0.7 ms into a burst: New 2.2 dB, Old 6.8 dB; at 10 ms: 8.92 vs 9.78 dB; both settle at 9.08 dB), so the mockup, plugin and manual text now follow the measurement. Not judged by ear yet.
 
 ## Later
-- Icon inside the VST3 bundle on macOS and Windows (installers and uninstaller already have icons)
 - Notarised and signed installers if funding allows
 - Listening tests and tuning of presets

@@ -98,6 +98,11 @@ jobs:
           osacompile -o "root/app/Uninstall $PRODUCT.app" packaging/macos-uninstall.applescript
           cp assets/icons/icon.icns "root/app/Uninstall $PRODUCT.app/Contents/Resources/applet.icns"
           cp manual/*.pdf "root/doc/$NAME-manual.pdf"
+          for b in root/vst3/*.vst3; do
+            mkdir -p "$b/Contents/Resources"; cp assets/icons/icon.icns "$b/Contents/Resources/icon.icns"
+            /usr/libexec/PlistBuddy -c "Delete :CFBundleIconFile" "$b/Contents/Info.plist" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :CFBundleIconFile string icon" "$b/Contents/Info.plist"
+          done
           for b in root/vst3/*.vst3; do codesign --force --deep -s - "$b"; done; codesign --force --deep -s - "root/app/Uninstall $PRODUCT.app"
           pkgbuild --root root/vst3 --identifier "$id.vst3" --version "$ver" --install-location "/Library/Audio/Plug-Ins/VST3" vst3.pkg
           pkgbuild --root root/app --identifier "$id.app" --version "$ver" --install-location "/Applications" app.pkg

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 # The release workflow rewrites the version on the next line from the tag, so menu, installer and release agree.
-project(Apurrr2500 VERSION 0.1.1 LANGUAGES C CXX)
+project(Apurrr2500 VERSION 0.1.2 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
