@@ -1,0 +1,65 @@
+[
+  {
+    "before": "apurrr2500-before-drums.mp3",
+    "after": "apurrr2500-after-drums-drum-bus-glue.mp3",
+    "preset": "Drum Bus Glue",
+    "source": "Drum loop",
+    "description": "Drum loop through the real Apurrr2500 C++ core with the factory preset Drum Bus Glue (Drum; glue, drums). The After clip is level matched to the Before clip (+0.2 dB)."
+  },
+  {
+    "before": "apurrr2500-before-bass.mp3",
+    "after": "apurrr2500-after-bass-drum-bus-glue.mp3",
+    "preset": "Drum Bus Glue",
+    "source": "Bass line",
+    "description": "Bass line through the real Apurrr2500 C++ core with the factory preset Drum Bus Glue (Drum; glue, drums). The After clip is level matched to the Before clip (-0.1 dB)."
+  },
+  {
+    "before": "apurrr2500-before-mix.mp3",
+    "after": "apurrr2500-after-mix-drum-bus-glue.mp3",
+    "preset": "Drum Bus Glue",
+    "source": "Full mix loop",
+    "description": "Full mix loop through the real Apurrr2500 C++ core with the factory preset Drum Bus Glue (Drum; glue, drums). The After clip is level matched to the Before clip (-0.5 dB)."
+  },
+  {
+    "before": "apurrr2500-before-drums.mp3",
+    "after": "apurrr2500-after-drums-drum-smash-parallel.mp3",
+    "preset": "Drum Smash Parallel",
+    "source": "Drum loop",
+    "description": "Drum loop through the real Apurrr2500 C++ core with the factory preset Drum Smash Parallel (Drum; parallel, crush, drums). The After clip is level matched to the Before clip (-2.0 dB)."
+  },
+  {
+    "before": "apurrr2500-before-bass.mp3",
+    "after": "apurrr2500-after-bass-drum-smash-parallel.mp3",
+    "preset": "Drum Smash Parallel",
+    "source": "Bass line",
+    "description": "Bass line through the real Apurrr2500 C++ core with the factory preset Drum Smash Parallel (Drum; parallel, crush, drums). The After clip is level matched to the Before clip (-1.8 dB)."
+  },
+  {
+    "before": "apurrr2500-before-mix.mp3",
+    "after": "apurrr2500-after-mix-drum-smash-parallel.mp3",
+    "preset": "Drum Smash Parallel",
+    "source": "Full mix loop",
+    "description": "Full mix loop through the real Apurrr2500 C++ core with the factory preset Drum Smash Parallel (Drum; parallel, crush, drums). The After clip is level matched to the Before clip (-2.3 dB)."
+  },
+  {
+    "before": "apurrr2500-before-drums.mp3",
+    "after": "apurrr2500-after-drums-kick-duck-ext-sc.mp3",
+    "preset": "Kick Duck Ext SC",
+    "source": "Drum loop",
+    "description": "Drum loop through the real Apurrr2500 C++ core with the factory preset Kick Duck Ext SC (Synth; sidechain, pump, trance). The After clip is level matched to the Before clip (+7.1 dB)."
+  },
+  {
+    "before": "apurrr2500-before-bass.mp3",
+    "after": "apurrr2500-after-bass-kick-duck-ext-sc.mp3",
+    "preset": "Kick Duck Ext SC",
+    "source": "Bass line",
+    "description": "Bass line through the real Apurrr2500 C++ core with the factory preset Kick Duck Ext SC (Synth; sidechain, pump, trance). The After clip is level matched to the Before clip (+3.1 dB)."
+  },
+  {
+    "before": "apurrr2500-before-mix.mp3",
+    "after": "apurrr2500-after-mix-kick-duck-ext-sc.mp3",
+    "preset": "Kick Duck Ext SC",
+    "source": "Full mix loop",
+    "description": "Full mix loop through the real Apurrr2500 C++ core with the factory preset Kick Duck Ext SC (Synth; sidechain, pump, trance). The After clip is level matched to the Before clip (+5.2 dB)."
+  }
+]
