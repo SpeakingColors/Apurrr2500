@@ -24,9 +24,6 @@ Threshold, Ratio, Make-up (Auto or Manual), Knee, Attack, Release (and Var), Til
 ## Build
 `sh tests/run.sh` runs the core DSP tests (no JUCE). `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release` builds the VST3 (JUCE is fetched). Needs Linux dev packages for JUCE (ALSA, X11, FreeType, fontconfig).
 
-## Privacy
-Collects nothing. No network access.
-
 ## Support
 <p align="center">
   <a href="https://ko-fi.com/studio87"><img src="https://img.shields.io/badge/Support_Studio_87-on_Ko--fi-FF5E5B?style=for-the-badge&logo=kofi&logoColor=white" alt="Support Studio 87 on Ko-fi"></a>
