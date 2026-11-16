@@ -359,10 +359,17 @@ void Modal::openAbout()
     upd->onClick = [updMsg] (const ModifierKeys&)
     {
         if (! URL (String (studio87link::updaterUrl ("Apurrr2500"))).launchInDefaultBrowser())
-            updMsg->setSegs ({ { studio87link::fallbackMessage(), false, false, true } });
+        {
+            studio87link::openGitHub ("Apurrr2500");   // no handler for studio87://: open the plugin's GitHub home page instead
+            updMsg->setSegs ({ { studio87link::fallbackNote(), false, false, true } });
+        }
     };
-    p->row ({ gh, rel, kofi, upd }, { 100, 100, 140, 240 }, 28);
-    p->row ({ updMsg }, { 0 }, 20);
+    auto* ghb = p->make<PButton> (c, studio87link::githubButtonText());
+    ghb->tip = studio87link::githubTipText();
+    ghb->onClick = [] (const ModifierKeys&) { studio87link::openGitHub ("Apurrr2500"); };
+    p->row ({ gh, rel, kofi }, { 100, 100, 140 }, 28);
+    p->row ({ upd, ghb }, { 240, 170 }, 28);
+    p->row ({ updMsg }, { 0 }, 36);
     p->textRow ({ { "Support is entirely optional. Nothing is locked.", false, false, true } }, 8);
     p->fit();
     show (std::move (p));
